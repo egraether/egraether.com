@@ -1,0 +1,2 @@
+server: true
+exclude: README.md, less.less, _drafts, syntax.css

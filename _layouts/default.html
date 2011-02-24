@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta name="author" content="Eberhard Gräther">
+
+  <title>egraether - {{ page.title }}</title>
+
+  <!--[if lt IE 9]>
+   <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  
+  <link rel="stylesheet" media="all" href="/styles/less.css"/>
+  
+  <!-- <link rel="stylesheet/less" type="text/css" href="/styles/less.less">
+  <script src="/javascripts/less.js" type="text/javascript"></script> -->
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <!-- Adding "maximum-scale=1" fixes the Mobile Safari auto-zoom bug: http://filamentgroup.com/examples/iosScaleBug/ -->
+</head>
+
+<body lang="en">
+  <h1 class="hide">Eberhard Gräther</h1>
+  <h1 class="hide">egraether</h1>
+  
+  <div id="main">
+
+    <header>
+      
+      <a href="/"><h1 id="logo"><span id="e">e</span>graether</h1></a>
+      
+      <div id="info">
+        Hi, my name is <span id="infoName">Eberhard Gräther</span>.<br />
+        I'm Bachelor student of <a href="http://multimediatechnology.at/in-english/">MultiMediaTechnology</a> 
+        at <a href="http://www.fh-salzburg.ac.at/en/">Salzburg University of Applied Sciences</a> 
+        with my major in <a href="http://multimediatechnology.at/ar-game/">Augmented Reality and Game</a>.<br />
+        <a href="/about.html">more...</a>
+      </div>
+      
+      <div class="floatClear"></div>
+      
+    </header>
+
+    <div id="content">
+      {{ content }}
+    </div>
+
+    <div class="footer">
+        <a href="http://github.com/egraether/">github</a>
+        <br />
+        <a href="http://twitter.com/egraether/">twitter</a>
+        <br />
+        <div id="modified">
+          last modified {{ site.time | date_to_string }}
+        </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+---
+layout: default
+title: home
+---
+<h3 id="projectsTitle">Projects:</h3>
+<ul id="projects">
+  {% for post in site.posts %}
+    <li>
+      <a href="{{ post.url }}">
+        <div>{{ post.title }}</div>
+        
+        <!-- <div style="background: url({{ post.previewImageUrl }}) no-repeat top left; width:150px; height:100px;"></div> -->
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+  

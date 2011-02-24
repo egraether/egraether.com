@@ -1,0 +1,50 @@
+---
+layout: default
+---
+
+{% assign nextUrl = site.posts.first.url %}
+{% assign previousUrl = site.posts.last.url %}
+
+{% assign found = false %}
+
+
+{% for post in site.posts %}
+
+  {% if found == true and nextUrl == site.posts.first.url %}
+    {% assign nextUrl = post.url %}
+  {% endif %}
+
+
+  {% if post.title == page.title %}
+    {% assign found = true %}
+  {% endif %}
+
+
+  {% if found == false %}
+    {% assign previousUrl = post.url %}
+  {% endif %}
+
+{% endfor %}
+
+<ul id="projectNavigation">
+  <li><a href="{{ previousUrl }}"><div class="button">previous</div></a></li>
+  <li><a href="/"><div class="button">all</div></a></li>
+  <li><a href="{{ nextUrl }}"><div class="button">next</div></a></li>
+</ul>
+
+<div class="floatClear"></div>
+
+<h2 id="projectTitle">{{ page.title }}</h2>
+
+<div id="projectContent">
+  {{ content }}
+</div>
+
+<!-- <div id="projectRelated">
+  <h2>Related Posts</h2>
+  <ul>
+    {% for post in site.related_posts limit:3 %}
+      <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
+  </ul>
+</div> -->
