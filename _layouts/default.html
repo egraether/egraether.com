@@ -23,38 +23,20 @@
 <body lang="en">
   <h1 class="hide">Eberhard Gräther</h1>
   <h1 class="hide">egraether</h1>
+
+  <header>
+    <a href="/"><h1 id="logo"><span id="e">e</span>graether</h1></a>
+    <div class="floatClear"></div>
+  </header>
   
-  <div id="main">
+  <div class="line"></div>
 
-    <header>
-      
-      <a href="/"><h1 id="logo"><span id="e">e</span>graether</h1></a>
-      
-      <div id="info">
-        Hi, my name is <span id="infoName">Eberhard Gräther</span>.<br />
-        I'm Bachelor student of <a href="http://multimediatechnology.at/in-english/">MultiMediaTechnology</a> 
-        at <a href="http://www.fh-salzburg.ac.at/en/">Salzburg University of Applied Sciences</a> 
-        with my major in <a href="http://multimediatechnology.at/ar-game/">Augmented Reality and Game</a>.<br />
-        <a href="/about.html">more...</a>
-      </div>
-      
-      <div class="floatClear"></div>
-      
-    </header>
+  {{ content }}
 
-    <div id="content">
-      {{ content }}
-    </div>
+  <div class="line" style="margin-bottom: 12px"></div>
 
-    <div class="footer">
-        <a href="http://github.com/egraether/">github</a>
-        <br />
-        <a href="http://twitter.com/egraether/">twitter</a>
-        <br />
-        <div id="modified">
-          last modified {{ site.time | date_to_string }}
-        </div>
-    </div>
+  <div id="footer">
+    <p><a href="http://egraether.com">egraether.com</a> is powered by <a href="https://github.com/mojombo/jekyll">jekyll</a>, <a href="http://lesscss.org/">LESS</a> and <a href="http://lessframework.com/">Less Framework 4</a> | last modified {{ site.time | date_to_string }} | <a href="https://github.com/egraether/egraether.com">fork on github</a></p>
   </div>
 
 </body>

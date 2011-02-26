@@ -2,16 +2,53 @@
 layout: default
 title: home
 ---
-<h3 id="projectsTitle">Projects:</h3>
-<ul id="projects">
-  {% for post in site.posts %}
-    <li>
-      <a href="{{ post.url }}">
-        <div>{{ post.title }}</div>
-        
-        <!-- <div style="background: url({{ post.previewImageUrl }}) no-repeat top left; width:150px; height:100px;"></div> -->
-      </a>
-    </li>
-  {% endfor %}
-</ul>
+
+<div class="content">
+  <div id="about">
+    <h4>About:</h4>
+    <p>
+      My name is <span id="infoName">Eberhard Gräther</span>.
+    </p>
+    <p>
+      I'm Bachelor student 
+      of <a href="http://multimediatechnology.at/in-english/">MultiMediaTechnology</a> 
+      at <a href="http://www.fh-salzburg.ac.at/en/">Salzburg University of Applied Sciences</a> 
+      with my major in <a href="http://multimediatechnology.at/ar-game/">Augmented Reality and Game</a>.
+    </p>
+  </div>
+
+  <div id="contact">
+    <h4>Contact:</h4>
+    <ul>
+      <li>mail: <a href="mailto:mail@egraether.com">mail@egraether.com</a></li>
+      <li>twitter: <a href="http://twitter.com/#!/egraether">@egraether</a></li>
+      <li>github: <a href="http://github.com/egraether/">egraether</a></li>
+    </ul>
+  </div>
+  
+  <div class="floatClear"></div>
+</div>
+
+<div class="line"></div>
+
+<div class="content">
+  <h4 id="projects">Projects:</h4>
+  <ul>
+    {% for post in site.posts %}
+      <li class="project">
+        <a href="{{ post.titlelink }}">
+          <div class="projectTitle">
+            {{ post.title }} <span class="projectLanguage">{ {{ post.language }} }</span>
+          </div>
+        </a>
+        <div class="projectContent">
+          {{ post.content }}
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+  <div class="floatClear"></div>
+</div>
+
+<!-- <div style="background: url({{ post.previewImageUrl }}) no-repeat top left; width:150px; height:100px;"></div> -->
   

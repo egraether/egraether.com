@@ -82,9 +82,8 @@ body {-webkit-tap-highlight-color: rgb(255,255,158);}
 
 @baseColor: #1B98BD;
 @textColor: rgb(60,60,60);
-@backgroundColor: rgb(232,232,232);
+@backgroundColor: rgb(245, 245, 245);
 @borderColor: @textColor;
-@buttonColor: #EDFAFD;
 
 .hide { display: none; }
 .floatClear { clear: both; }
@@ -116,29 +115,47 @@ body {-webkit-tap-highlight-color: rgb(255,255,158);}
           transition: all 0.123s ease-out;
 }
 
-.box { 
-
-}
-.button {
-  padding: 6px 12px;
-  margin: 0 12px 12px 0;
-  color: saturate(@baseColor, 5%);
-  border: 1px darken(@baseColor, 10%) solid;
-  
-  .round(20px);
-  .transition;
-  
-  float: left;
-  
-  &:hover { .shadowIn(0, 0, 3px, 0.4); }
-}
-
 a {
   text-decoration: none;
-  color: @baseColor;
+  color: darken(@baseColor, 7%);
   
-  &:visited { color: @baseColor - #222222; }
-  &:hover { color: @baseColor + #111111; }
+  &:visited { color: darken(@baseColor, 20%); }
+  &:hover { color: lighten(@baseColor, 4%); }
+}
+
+.button {
+  padding: 2px 8px 1px;
+  margin-top: 12px;
+  margin-right: 12px;
+  
+  color: @textColor;
+  border: 1px @textColor solid;
+  
+  float: right;
+  
+  .shadowOut(1px, 1px, 5px, 0.3);
+  .round(20px);
+  
+  &:hover { 
+    .shadowIn(0px, 0px, 0px, 0);
+    border: 1px lighten(@textColor, 20%) solid;
+    color: lighten(@textColor, 20%);
+  }
+}
+
+.buttonLeft {
+  .button;
+  float: left;
+  margin-bottom: 24px;
+}
+
+.line {
+  width: 896px;
+  margin: 24px auto;
+  background-color: @borderColor;
+  height: 2px;
+  
+  .shadowOut(1px, 1px, 5px, 0.3);
 }
 
 /*    Default Layout: 992px. 
@@ -155,44 +172,86 @@ body {
   -webkit-text-size-adjust: 100%; /* Stops Mobile Safari from auto-adjusting font-sizes */
 }
 
-#main {
+header {padding-top: 48px;}
+#footer {
+  padding-bottom: 72px;
+  .small;
+}
+
+header, #footer, .content {
   width: 896px;
-  padding: 72px 48px 84px;
+  padding-left: 48px;
+  padding-right: 48px;
   margin: 0 auto;
 }
 
-header, #content {
-  margin-bottom: 24px;
-  border-bottom: 3px @borderColor solid;
+.content {
+  width: 920px;
+  padding-right: 24px;
 }
-
-#logo, #info { margin-bottom: 24px; }
 
 #logo { 
   font-size: 72px;
-  width: 436px;
-  margin-right: 24px;
-  color: @textColor; 
-  float: left; 
+  color: @textColor;
+  float: left;
 }
 
 #e { color: @baseColor; }
 
-#info {
-  width: 398px;
+#infoName { font-weight: bold; }
+
+#about, #contact, .project {
   float: left;
+  margin: 12px 24px 12px 0;
+}
+
+.project {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+#about { width: 596px; }
+#contact { width: 228px; }
+
+#about p, #about h4 { margin-bottom: 12px; }
+
+#projects {
+  padding-top: 12px;
+}
+
+.project {
+  width: 436px;
+}
+
+.projectTitle {
+  .big;
+}
+
+.projectLanguage {
   .small;
-  border: 1px darken(@baseColor, 10%) solid;
-  .round(20px);
-  padding: 12px 18px;
+  color: lighten(@textColor, 20%);
 }
 
-#content { padding-bottom: 24px; }
-
-#projectsTitle {
-  margin-top: 8px;
-  margin-bottom: 16px;
+.projectSubtitle {
+  font-weight: bold;
+  margin: 12px 0;
 }
+
+.projectText {
+  
+}
+
+.projectButtons {
+  margin: 0 auto;
+}
+
+#pong {
+  margin: 24px auto; 
+  width: 500px;
+  .shadowOut(1px, 1px, 5px, 0.3);
+  background-color: white;
+}
+
 
 /*    Tablet Layout: 768px.
     Gutters: 24px.
@@ -204,36 +263,30 @@ px      68    160    252    344    436    528    620    712    */
 
 @media only screen and (min-width: 768px) and (max-width: 991px) {
   
-  #main {
+  .line {width: 712px;}
+  
+  header {padding-top: 48px;}
+  #footer {padding-bottom: 60px;}
+  
+  header, #footer, .content {
     width: 712px;
-    padding: 48px 28px 60px;
+    padding-right: 28px;
+    padding-left: 28px;
   }
   
-  #logo { width: 344px; }
-  #info { width: 306px; }
-}
-
-
-
-/*    Wide Mobile Layout: 480px.
-    Gutters: 24px.
-    Outer margins: 22px.
-    Inherits styles from: Default Layout, Mobile Layout.
-------------------------------------------------------------
-cols    1     2      3      4      5
-px      68    160    252    344    436    */
-
-@media only screen and (min-width: 480px) and (max-width: 767px) {
-  
-  #main {
-    width: 436px;
-    padding: 36px 22px 48px;
+  .content {
+    width: 736px;
+    padding-right: 4px;
   }
   
-  #logo { width: 252px; }
-  #info { width: 214px; }
+  #about {
+    width: 412px; 
+  }
+  
+  .project { 
+    width: 344px; 
+  }
 }
-
 
 
 /*    Mobile Layout: 320px.
@@ -246,15 +299,61 @@ px      68    160    252    */
 
 @media only screen and (max-width: 767px) {
   
-  #main {
+  .line {width: 252px;}
+  
+  header {padding-top: 48px;}
+  #footer {padding-bottom: 60px;}
+  
+  header, .content, #footer {
     width: 252px;
-    padding: 48px 34px 60px;
+    padding-left: 34px;
+    padding-right: 34px;
   }
   
   #logo {
     .large;
+  }
+  
+  #about, #contact {
     width: 252px;
   }
   
-  #info { width: 214px; }
+  .project { 
+    width: 252px; 
+  }
+}
+
+
+/*    Wide Mobile Layout: 480px.
+    Gutters: 24px.
+    Outer margins: 22px.
+    Inherits styles from: Default Layout, Mobile Layout.
+------------------------------------------------------------
+cols    1     2      3      4      5
+px      68    160    252    344    436    */
+
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+  
+  .line {width: 436px;}
+  
+  header {padding-top: 36px;}
+  #footer {padding-bottom: 48px;}
+  
+  header, .content, #footer {
+    width: 436px;
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+  
+  #logo {
+    .huge;
+  }
+  
+  #about, #contact {
+    width: 436px;
+  }
+  
+  .project { 
+    width: 436px; 
+  }
 }
