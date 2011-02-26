@@ -18,6 +18,20 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <!-- Adding "maximum-scale=1" fixes the Mobile Safari auto-zoom bug: http://filamentgroup.com/examples/iosScaleBug/ -->
+  
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-18871992-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
 </head>
 
 <body lang="en">
@@ -36,7 +50,7 @@
   <div class="line" style="margin-bottom: 12px"></div>
 
   <div id="footer">
-    <p><a href="http://egraether.com">egraether.com</a> is powered by <a href="https://github.com/mojombo/jekyll">jekyll</a>, <a href="http://lesscss.org/">LESS</a> and <a href="http://lessframework.com/">Less Framework 4</a> | last modified {{ site.time | date_to_string }} | <a href="https://github.com/egraether/egraether.com">fork on github</a></p>
+    <p><a href="http://egraether.com">egraether.com</a> is powered by <a href="https://github.com/mojombo/jekyll">jekyll</a>, <a href="http://lesscss.org/">LESS</a> and <a href="http://lessframework.com/">Less Framework 4</a> | this site uses <a href="http://www.google.com/analytics/">Google Analytics</a> | last modified {{ site.time | date_to_string }} | <a href="https://github.com/egraether/egraether.com">fork on github</a></p>
   </div>
 
 </body>
