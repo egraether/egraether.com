@@ -1,2 +1,3 @@
 server: true
+auto: true
 exclude: README.md, less.less, _drafts, syntax.css

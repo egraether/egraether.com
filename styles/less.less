@@ -80,7 +80,9 @@ body {-webkit-tap-highlight-color: rgb(255,255,158);}
 
 /* main style */
 
-@baseColor: #1B98BD;
+/*@baseColor: #1B98BD;*/
+@baseColor: #CF000C;
+
 @textColor: rgb(60,60,60);
 @backgroundColor: rgb(245, 245, 245);
 @borderColor: @textColor;
@@ -111,8 +113,17 @@ body {-webkit-tap-highlight-color: rgb(255,255,158);}
 
 .transition {
   -webkit-transition: all 0.123s ease-out;
-     -moz-transition: all 0.123s ease-out;  
+     -moz-transition: all 0.123s ease-out;
           transition: all 0.123s ease-out;
+}
+
+.gradient {
+  
+  @fromColor: @backgroundColor;
+  @toColor: darken(@backgroundColor, 15%);
+  
+  background: -webkit-gradient(linear, left top, left bottom, from(@fromColor), to(@toColor));
+  background: -moz-linear-gradient(top,  @fromColor, @toColor);
 }
 
 a {
@@ -132,14 +143,10 @@ a {
   border: 1px @textColor solid;
   
   float: right;
-  
-  .shadowOut(1px, 1px, 5px, 0.3);
-  .round(20px);
+  .round(2px);
   
   &:hover { 
-    .shadowIn(0px, 0px, 0px, 0);
-    border: 1px lighten(@textColor, 20%) solid;
-    color: lighten(@textColor, 20%);
+    .shadowIn(0px, 0px, 5px, 0.3);
   }
 }
 
@@ -154,8 +161,6 @@ a {
   margin: 24px auto;
   background-color: @borderColor;
   height: 2px;
-  
-  .shadowOut(1px, 1px, 5px, 0.3);
 }
 
 /*    Default Layout: 992px. 
@@ -166,13 +171,25 @@ a {
 cols    1     2      3      4      5      6      7      8      9      10
 px      68    160    252    344    436    528    620    712    804    896    */
 
+html {
+  min-height: 100%;
+}
+
 body {
-  background: @backgroundColor;
+  min-height: 100%;
+  
+  background-color: @backgroundColor;
+  .gradient;
+  
   color: @textColor;
   -webkit-text-size-adjust: 100%; /* Stops Mobile Safari from auto-adjusting font-sizes */
 }
 
-header {padding-top: 48px;}
+header {
+  padding-top: 72px;
+  height: 72px;
+}
+
 #footer {
   padding-bottom: 72px;
   .small;
@@ -193,10 +210,22 @@ header, #footer, .content {
 #logo { 
   font-size: 72px;
   color: @textColor;
-  float: left;
+  
+  position: absolute;
 }
 
 #e { color: @baseColor; }
+
+#image {
+  
+  position: absolute;
+  
+  img {
+    left: 366px;
+    top: -70px;
+    position: absolute;
+  }
+}
 
 #infoName { font-weight: bold; }
 
