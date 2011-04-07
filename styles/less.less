@@ -111,13 +111,13 @@ body {-webkit-tap-highlight-color: rgb(255,255,158);}
           box-shadow: @val;
 }
 
-.transition {
+.transition() {
   -webkit-transition: all 0.123s ease-out;
      -moz-transition: all 0.123s ease-out;
           transition: all 0.123s ease-out;
 }
 
-.gradient {
+.gradient() {
   
   @fromColor: @backgroundColor;
   @toColor: darken(@backgroundColor, 15%);
@@ -148,12 +148,17 @@ a {
   &:hover { 
     .shadowIn(0px, 0px, 5px, 0.3);
   }
+  
+  a {
+    color: @textColor;
+    &:visited { color: @textColor; }
+    &:hover { color: @textColor; }
+  }
 }
 
 .buttonLeft {
   .button;
   float: left;
-  margin-bottom: 24px;
 }
 
 .line {
@@ -237,6 +242,7 @@ header, #footer, .content {
 .project {
   margin-top: 24px;
   margin-bottom: 24px;
+  height: 300px;
 }
 
 #about { width: 596px; }
@@ -275,7 +281,7 @@ header, #footer, .content {
 }
 
 #pong {
-  margin: 24px auto; 
+  margin: 48px auto 24px; 
   width: 500px;
   .shadowOut(1px, 1px, 5px, 0.3);
   background-color: white;
@@ -313,7 +319,8 @@ px      68    160    252    344    436    528    620    712    */
   }
   
   .project { 
-    width: 344px; 
+    width: 344px;
+    height: 350px;
   }
 }
 
@@ -330,7 +337,10 @@ px      68    160    252    */
   
   .line {width: 252px;}
   
-  header {padding-top: 48px;}
+  header {
+    padding-top: 48px;
+    height: 36px;
+  }
   #footer {padding-bottom: 60px;}
   
   header, .content, #footer {
@@ -343,12 +353,15 @@ px      68    160    252    */
     .large;
   }
   
+  #image {display: none;}
+  
   #about, #contact {
     width: 252px;
   }
   
   .project { 
-    width: 252px; 
+    width: 252px;
+    height: auto;
   }
 }
 
@@ -365,8 +378,13 @@ px      68    160    252    344    436    */
   
   .line {width: 436px;}
   
-  header {padding-top: 36px;}
+  header {
+    padding-top: 36px;
+    height: 72px;
+  }
   #footer {padding-bottom: 48px;}
+  
+  #image {display: none;}
   
   header, .content, #footer {
     width: 436px;
@@ -383,6 +401,7 @@ px      68    160    252    344    436    */
   }
   
   .project { 
-    width: 436px; 
+    width: 436px;
+    height: auto;
   }
 }
