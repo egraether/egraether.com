@@ -80,8 +80,10 @@ body {-webkit-tap-highlight-color: rgb(255,255,158);}
 
 /* main style */
 
-/*@baseColor: #1B98BD;*/
+/*@baseColor: #1B98BD;
 @baseColor: #CF000C;
+@baseColor: #318ECE;*/
+@baseColor: #6EAE0D;
 
 @textColor: rgb(60,60,60);
 @backgroundColor: rgb(245, 245, 245);
@@ -94,6 +96,12 @@ body {-webkit-tap-highlight-color: rgb(255,255,158);}
   -webkit-border-radius: @radius;
      -moz-border-radius: @radius;
           border-radius: @radius;
+}
+
+.roundProject (@radius: 5px) {
+  -webkit-border-top-right-radius: @radius;
+     -moz-border-top-right-radius: @radius;
+          border-top-right-radius: @radius;
 }
 
 .shadowIn (@x: 0, @y: 0, @blur: 1px, @alpha: 0.5) {
@@ -128,10 +136,8 @@ body {-webkit-tap-highlight-color: rgb(255,255,158);}
 
 a {
   text-decoration: none;
-  color: darken(@baseColor, 7%);
-  
-  &:visited { color: darken(@baseColor, 20%); }
-  &:hover { color: lighten(@baseColor, 4%); }
+  color: darken(@baseColor, 10%);
+  &:hover { color: @baseColor; }
 }
 
 .button {
@@ -143,7 +149,7 @@ a {
   border: 1px @textColor solid;
   
   float: right;
-  .round(2px);
+/*  .round(2px);*/
   
   &:hover { 
     .shadowIn(0px, 0px, 5px, 0.3);
@@ -151,7 +157,6 @@ a {
   
   a {
     color: @textColor;
-    &:visited { color: @textColor; }
     &:hover { color: @textColor; }
   }
 }
@@ -182,9 +187,7 @@ html {
 
 body {
   min-height: 100%;
-  
   background-color: @backgroundColor;
-  .gradient;
   
   color: @textColor;
   -webkit-text-size-adjust: 100%; /* Stops Mobile Safari from auto-adjusting font-sizes */
@@ -239,14 +242,14 @@ header, #footer, .content {
   margin: 12px 24px 12px 0;
 }
 
-.project {
-  margin-top: 24px;
-  margin-bottom: 24px;
-  height: 300px;
-}
-
 #about { width: 596px; }
-#contact { width: 228px; }
+#contact { 
+  width: 228px; 
+  p {
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+}
 
 #about p, #about h4 { margin-bottom: 12px; }
 
@@ -255,25 +258,41 @@ header, #footer, .content {
 }
 
 .project {
+  margin-top: 24px;
+  margin-bottom: 24px;
   width: 436px;
+  height: 370px;
 }
 
 .projectTitle {
   .big;
+  padding: 15px 12px 15px;
+  color: @backgroundColor;
+  
+  background-repeat: no-repeat;
+  background-color: @textColor;
+  
+  .shadowOut(-3px, 3px, 10px);
+  
+  &:hover {
+    background-position: 0px -72px;
+  }
 }
 
 .projectLanguage {
   .small;
-  color: lighten(@textColor, 20%);
+  line-height: 12px;
+  color: lighten(@baseColor, 5%);
 }
 
 .projectSubtitle {
   font-weight: bold;
   margin: 12px 0;
+  padding: 0px 12px;
 }
 
 .projectText {
-  
+  padding: 0px 12px;
 }
 
 .projectButtons {
@@ -320,7 +339,7 @@ px      68    160    252    344    436    528    620    712    */
   
   .project { 
     width: 344px;
-    height: 350px;
+    height: 400px;
   }
 }
 
