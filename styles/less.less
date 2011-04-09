@@ -260,8 +260,9 @@ header, #footer, .content {
 .project {
   margin-top: 24px;
   margin-bottom: 24px;
+  padding-bottom: 12px;
   width: 436px;
-  height: 370px;
+  border-bottom: 2px solid @textColor;
 }
 
 .projectTitle {
@@ -287,16 +288,16 @@ header, #footer, .content {
 
 .projectSubtitle {
   font-weight: bold;
-  margin: 12px 0;
-  padding: 0px 12px;
+  padding: 12px 0px;
 }
 
 .projectText {
   padding: 0px 12px;
+  height: 264px;
 }
 
 .projectButtons {
-  margin: 0 auto;
+  
 }
 
 #pong {
@@ -339,7 +340,10 @@ px      68    160    252    344    436    528    620    712    */
   
   .project { 
     width: 344px;
-    height: 400px;
+  }
+  
+  .projectText { 
+    height: 312px;
   }
 }
 
@@ -380,6 +384,9 @@ px      68    160    252    */
   
   .project { 
     width: 252px;
+  }
+  
+  .projectText { 
     height: auto;
   }
 }
@@ -421,6 +428,5 @@ px      68    160    252    344    436    */
   
   .project { 
     width: 436px;
-    height: auto;
   }
 }
