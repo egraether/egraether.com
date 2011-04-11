@@ -10,15 +10,15 @@ title: home
     </p>
     <p>
       I'm student of bachelor's degree
-      in <a href="http://multimediatechnology.at/in-english/">MultiMediaTechnology</a> 
-      at <a href="http://www.fh-salzburg.ac.at/en/">Salzburg University of Applied Sciences</a> 
-      with my major in <a href="http://multimediatechnology.at/ar-game/">Augmented Reality and Game</a>.
+      in <a href="http://multimediatechnology.at/in-english/" target="blank">MultiMediaTechnology</a> 
+      at <a href="http://www.fh-salzburg.ac.at/en/" target="blank">Salzburg University of Applied Sciences</a> 
+      with my major in <a href="http://multimediatechnology.at/ar-game/" target="blank">Augmented Reality and Game</a>.
     </p>
     <p>
       I develop games with special interest in game & interaction design. I hope you enjoy my projects, it was hard work creating them.
     </p>
     <p>
-      <a href="/downloads/resume_egraether.pdf"><div class="buttonLeft">resum&eacute;</div></a>
+      <a href="/downloads/resume_egraether.pdf" target="blank"><div class="buttonLeft">resum&eacute;</div></a>
     </p>
   </div>
 
@@ -26,8 +26,8 @@ title: home
     <p>Contact:</p>
     <ul>
       <li>mail: <a href="mailto:mail@egraether.com">mail@egraether.com</a></li>
-      <li>twitter: <a href="http://twitter.com/#!/egraether">@egraether</a></li>
-      <li>github: <a href="http://github.com/egraether/">egraether</a></li>
+      <li>twitter: <a href="http://twitter.com/#!/egraether" target="blank">@egraether</a></li>
+      <li>github: <a href="http://github.com/egraether/" target="blank">egraether</a></li>
     </ul>
   </div>
   
@@ -40,15 +40,15 @@ title: home
   <ul>
     {% for post in site.posts %}
       <li class="project">
-        <a href="{{ post.titlelink }}">
-          <div class="projectTitle" style="background-image: url(/images/{{ post.picture }})">
+        <a href="{{ post.titlelink }}" target="blank">
+          <div class="projectTitle" style="background-image: url(/images/{{ post.name }}_pic.png)">
             <div>{{ post.title }}</div>
             <div class="projectLanguage">{ {{ post.language }} }</div>
           </div>
         </a>
-        <!-- <div class="projectContent"> -->
+        <div class="projectContent">
           {{ post.content }}
-        <!-- </div> -->
+        </div>
       </li>
     {% endfor %}
   </ul>
