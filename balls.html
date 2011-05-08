@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang=en>
+<head>
+    <meta name="author" content="Eberhard Gräther">
+    <title>egraether - Balls</title>
+    
+    <style type="text/css">
+        * {
+            padding: 0; 
+            margin: 0; 
+            overflow: hidden;
+        }
+        #canvas {
+            z-index: -1;
+            position: absolute;
+            top: 0px;
+        }
+        p {
+            font: 16px/24px Georgia, serif;
+            padding: 10px;
+        }
+    </style>
+    
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-18871992-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+</head>
+<body>
+    <p>
+        comparison of particle shaders by <a href="http://egraether.com">egraether</a> - click to switch shader - <a href="http://egraether.com">more</a>
+    </p>
+    <canvas id="canvas">
+        Your browser does not support &lt;canvas&gt; and WebGL<br/>
+        <a href="http://get.webgl.org">http://get.webgl.org</a>
+    </canvas>
+
+<script id="vertex-shader" type="x-shader/x-vertex" charset="utf-8">
+
+    uniform vec2 offset;
+    
+    attribute vec4 position;
+    
+    varying vec3 color;
+    
+    void main( void ) {
+        
+        vec2 pos = position.xy - offset * ( 0.5 - 0.01 * position.z );
+    
+        gl_Position = vec4( pos.xy, 1.0, 1.0 );
+        gl_PointSize = position.z;
+        
+        float c = position.w;
+        
+        color.r = step( 4.0, c );
+        c = mod( c, 4.0 );
+        
+        color.g = step( 2.0, c );
+        c = mod( c, 2.0);
+        
+        color.b = step( 1.0, c );
+    
+    }
+    
+</script>
+
+<script id="tex-fragment-shader" type="x-shader/x-fragment" charset="utf-8">
+    
+    #ifdef GL_ES
+        precision highp float;
+    #endif
+
+    uniform sampler2D texture;
+
+    varying vec3 color;
+
+    void main(void) {
+
+        vec4 texel = texture2D( texture, gl_PointCoord );
+        gl_FragColor = vec4( mix( texel.rgb, color, 0.3 ), texel.a );
+
+    }
+    
+</script>
+
+<script id="dist-fragment-shader" type="x-shader/x-fragment" charset="utf-8">
+    
+    #ifdef GL_ES
+        precision highp float;
+    #endif
+
+    varying vec3 color;
+    
+    const vec2 center = vec2( 0.5, 0.5 );
+    const vec2 shine = vec2( 0.35, 0.35 );
+
+    void main(void) {
+        
+        vec4 texel = vec4( 1.0, 1.0, 1.0, step( 0.0, 0.85 - 2.0 * distance( gl_PointCoord, center ) ) );
+        float dist = distance( gl_PointCoord, shine ) * 1.9;
+        gl_FragColor = vec4( mix( texel.rgb - dist * dist, color, 0.3 ), texel.a );
+
+    }
+    
+</script>
+
+<script type="text/javascript" charset="utf-8">
+
+    /**
+     * Provides requestAnimationFrame in a cross browser way.
+     * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+     */
+
+    if ( !window.requestAnimationFrame ) {
+
+        window.requestAnimationFrame = ( function() {
+
+        return window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame || // comment out if FF4 is slow (it caps framerate at ~30fps: https://bugzilla.mozilla.org/show_bug.cgi?id=630127)
+            window.oRequestAnimationFrame ||
+            window.msRequestAnimationFrame ||
+            function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+                window.setTimeout( callback, 1000 / 60 );
+            };
+        } )();
+
+    }
+
+    function loadShader(vertexShaderID, fragmentShaderID) {
+
+        var vertexShader = loadShaderScript(vertexShaderID),
+            fragmentShader = loadShaderScript(fragmentShaderID),
+            shaderProgram = gl.createProgram();
+
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+
+        gl.linkProgram(shaderProgram);
+
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+
+            console.log("Unable to initialize the shader program.");
+
+        }
+
+        return shaderProgram;
+
+    };
+
+    function loadShaderScript(shaderScriptID) {
+
+        var shaderScript = document.getElementById(shaderScriptID),
+            shader;
+
+        if (shaderScript.type === "x-shader/x-fragment") {
+
+            shader = gl.createShader(gl.FRAGMENT_SHADER);
+
+        } else if (shaderScript.type === "x-shader/x-vertex") {
+
+            shader = gl.createShader(gl.VERTEX_SHADER);
+
+        } else {
+
+            return null;
+
+        }
+
+
+        gl.shaderSource(shader, shaderScript.text);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+
+            console.log("shader " + gl.getShaderInfoLog(shader));
+            return null;
+
+        }
+
+        return shader;
+
+    };
+    
+    function initShader(vertexShaderID, fragmentShaderID) {
+        
+        var shader = loadShader(vertexShaderID, fragmentShaderID);
+        gl.useProgram(shader);
+        
+        shader.offsetUniformLocation = gl.getUniformLocation(shader, "offset");
+        shader.positionAttribLocation = gl.getAttribLocation(shader, "position");
+        
+        gl.enableVertexAttribArray(shader.positionAttribLocation);
+        gl.vertexAttribPointer(shader.positionAttribLocation, 4, gl.FLOAT, false, 0, 0);
+        
+        return shader;
+        
+    }
+    
+    function loadTexture(imagePath, callback) {
+        
+        var texture = gl.createTexture();
+        texture.image = new Image();
+
+        texture.image.onload = function () {
+
+            gl.bindTexture( gl.TEXTURE_2D, texture );
+
+            gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
+            gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image );
+            
+            gl.generateMipmap( gl.TEXTURE_2D );
+            
+            gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR_MIPMAP_LINEAR );
+            gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR );
+            
+            gl.uniform1i( gl.getUniformLocation( texShader, "texture" ), 0 );
+            
+            callback();
+
+        }
+
+        texture.image.src = imagePath;
+        
+    };
+    
+    document.onmousemove = function(event) {
+
+        offsetX = event.clientX / canvas.width * 2 - 1,
+        offsetY = event.clientY / canvas.height * -2 + 1;
+
+        requestAnimationFrame(render, canvas);
+
+    };
+    
+    document.onmouseup = function(event) {
+            
+        activeShader = activeShader === texShader ? distShader : texShader;
+
+        gl.useProgram(activeShader);
+
+        requestAnimationFrame(render, canvas);
+
+    };
+    
+    function render() {
+        
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        
+        gl.uniform2fv(
+            activeShader.offsetUniformLocation, 
+            new Float32Array([offsetX, offsetY])
+        );
+        
+        gl.drawArrays(gl.POINTS, 0, ballAmount);
+        
+    };
+
+    var canvas, gl, activeShader, texShader, distShader, 
+        ballAmount = 250, offsetX = 0, offsetY = 0;
+
+    window.onload = function() {
+
+        canvas = document.getElementById("canvas");
+
+        canvas.width = window.innerWidth,
+        canvas.height = window.innerHeight;
+        
+        if (!window.WebGLRenderingContext) {
+            
+            canvas.parentNode.innerHTML += '<p>Your browser does not support WebGL.<br/>' + 
+                '<a href="http://get.webgl.org">http://get.webgl.org</a></p>';
+            return;
+            
+        }
+
+        gl = canvas.getContext("experimental-webgl");
+
+        gl.clearColor(1.0, 1.0, 1.0, 1.0);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        
+        
+        var buffer = gl.createBuffer(),
+            balls = [];
+        
+        for (var i = 0; i < ballAmount; i++) {
+            
+            var color = (Math.random() > .5 ? 1 : 0) * 4 +
+                        (Math.random() > .5 ? 1 : 0) * 2 +
+                        (Math.random() > .5 ? 1 : 0);
+            
+            balls.push(
+                Math.random() * 2 - 1, 
+                Math.random() * 2 - 1, 
+                (i / ballAmount + 1) * canvas.width / 35,
+                color
+            );
+            
+        }
+        
+        var array = new Float32Array(balls);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, array, gl.STATIC_DRAW);
+        
+        distShader = initShader("vertex-shader", "dist-fragment-shader");
+        texShader = initShader("vertex-shader", "tex-fragment-shader");
+        
+        activeShader = texShader;
+        
+        loadTexture(
+            "images/ball.png", 
+            render
+        );
+        
+    };
+    
+</script>
+
+</body>
+</html>
