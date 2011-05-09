@@ -236,10 +236,8 @@
     
     document.onmousemove = function(event) {
 
-        offsetX = event.clientX / canvas.width * 2 - 1,
-        offsetY = event.clientY / canvas.height * -2 + 1;
-
-        requestAnimationFrame(render, canvas);
+        mouseX = event.clientX / canvas.width * 2 - 1,
+        mouseY = event.clientY / canvas.height * -2 + 1;
 
     };
     
@@ -249,11 +247,14 @@
 
         gl.useProgram(activeShader);
 
-        requestAnimationFrame(render, canvas);
-
     };
     
     function render() {
+        
+        offsetX += (mouseX - offsetX) * 0.15;
+        offsetY += (mouseY - offsetY) * 0.15;
+        
+        requestAnimationFrame(render, canvas);
         
         gl.clear(gl.COLOR_BUFFER_BIT);
         
@@ -267,7 +268,7 @@
     };
 
     var canvas, gl, activeShader, texShader, distShader, 
-        ballAmount = 250, offsetX = 0, offsetY = 0;
+        ballAmount = 250, offsetX = 0, offsetY = 0, mouseX = 0, mouseY = 0;
 
     window.onload = function() {
 
