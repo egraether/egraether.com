@@ -18,7 +18,7 @@ title: home
       I develop games with special interest in game & interaction design. I hope you like my projects, it was a lot of work to make them.
     </p>
     <p>
-      I'm looking for an <span class="bold">internship</span> this summer/autumn.
+      I'm looking for an <span class="bold">internship</span> this fall.
     </p>
     <p>
       <a href="/downloads/resume_egraether.pdf" target="blank"><div class="buttonLeft">resum&eacute;</div></a>
@@ -43,7 +43,7 @@ title: home
   <ul>
     {% for post in site.posts %}
       <li class="project">
-        <a href="{{ post.titlelink }}" target="blank">
+        <a name="{{ post.name }}" href="{{ post.titlelink }}" target="blank">
           <div class="projectTitle" style="background-image: url(/images/{{ post.name }}_pic.png)">
             <div>{{ post.title }}</div>
             <div class="projectLanguage">{ {{ post.language }} }</div>
