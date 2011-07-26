@@ -14,7 +14,6 @@
             z-index: -1;
             position: absolute;
             top: 0px;
-            background-color: black;
         }
         p {
             font: 16px/24px Georgia, serif;
@@ -542,9 +541,8 @@
         meshB.draw(gl);
         
         gl.depthMask(true);
-        gl.disable(gl.BLEND);
         
-        gl.clear(gl.DEPTH_BUFFER_BIT);
+        gl.disable(gl.BLEND);
         
         if (intersection) {
             
@@ -570,52 +568,62 @@
         
         drawIntersection(meshB, meshA);
         
-        gl.stencilFunc(gl.ALWAYS, 0, 0);
-        
     };
     
     function drawIntersection(meshA, meshB) {
         
-        gl.colorMask(false, false, false, false);
-        gl.stencilFunc(gl.ALWAYS, 0, 0);
-        gl.depthMask(true);
+        // write A in depth buffer
         
-        gl.clear(gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+        gl.colorMask(false, false, false, false);
         
         meshA.draw(gl);
         
         
+        // increment stencil each fragment where B is in front of A
+        
         gl.depthMask(false);
         gl.disable(gl.CULL_FACE);
         
-        gl.stencilFunc(gl.ALWAYS, 0, 0);
         gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
         
         meshB.draw(gl);
         
         
+        // draw A where B hides it once
+        
         gl.colorMask(true, true, true, true);
         gl.enable(gl.CULL_FACE);
         
-        gl.depthMask(true);
-        gl.clear(gl.DEPTH_BUFFER_BIT);
+        gl.depthFunc(gl.ALWAYS);
         
         gl.stencilFunc(gl.EQUAL, 1, 1);
         gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
         
         meshA.draw(gl);
         
+        
+        // reset buffer behavior
+        
+        gl.stencilFunc(gl.ALWAYS, 0, 0);
+        
+        gl.depthMask(true);
+        gl.depthFunc(gl.LESS);
+        
     };
     
     function drawSubtraction(meshA, meshB) {
         
+        // write back of A in depth and stencil
+        
         gl.colorMask(false, false, false, false);
         gl.cullFace(gl.FRONT);
         
-        gl.stencilFunc(gl.ALWAYS, 0, 0);
         gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
         
         meshA.draw(gl);
+        
+        
+        // draw back of B where it hides backside of A
         
         gl.colorMask(true, true, true, true);
         gl.uniform1f(shader.normalDirectionUniform, -1.0);
@@ -623,6 +631,9 @@
         gl.stencilFunc(gl.EQUAL, 1, 1);
         
         meshB.draw(gl);
+        
+        
+        // draw front of A where it is falsly hiden by back of B
         
         gl.cullFace(gl.BACK);
         gl.uniform1f(shader.normalDirectionUniform, 1.0);
@@ -634,7 +645,8 @@
         
         gl.clear(gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
         
-        // ----
+        
+        // write front of B in depth
         
         gl.stencilFunc(gl.ALWAYS, 0, 0);
         gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
@@ -644,13 +656,16 @@
         
         meshB.draw(gl);
         
+        
+        // draw front of A
+        
         gl.colorMask(true, true, true, true);
         
         meshA.draw(gl);
         
     };
 
-    var canvas, gl, shader, 
+    var gl, shader, 
         meshA, meshB,
         up, axis,
         mvMatrix, rotMatrix = mat4.create(),
@@ -660,7 +675,7 @@
 
     window.onload = function() {
 
-        canvas = document.getElementById("canvas");
+        var canvas = document.getElementById("canvas");
         
         if (!window.WebGLRenderingContext) {
             
