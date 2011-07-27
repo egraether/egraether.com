@@ -10,7 +10,7 @@ var Edge = function(from, to) {
     
 };
 
-Edge.strength = 100;
+Edge.strength = 200;
 
 Edge.prototype = {
     

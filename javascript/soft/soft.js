@@ -30,9 +30,9 @@ function loadShader(gl, vertexShaderID, fragmentShaderID) {
     gl.linkProgram(shaderProgram);
 
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-
+    
         console.log("Unable to initialize the shader program.");
-
+    
     }
 
     return shaderProgram;
@@ -81,7 +81,6 @@ function initShader(gl, vertexShaderID, fragmentShaderID) {
     shader.mvMatrixUniform = gl.getUniformLocation(shader, "uMVMatrix");
     shader.pMatrixUniform = gl.getUniformLocation(shader, "uPMatrix");
     
-    shader.normalDirectionUniform = gl.getUniformLocation(shader, "uNormalDirection");
     shader.colorUniform = gl.getUniformLocation(shader, "uColor");
     shader.lightUniform = gl.getUniformLocation(shader, "uLight");
     
@@ -144,7 +143,13 @@ function render() {
     
     // if (end) return;
     
-    var dt = 0.025;
+    var dt,
+        t = (new Date()).getTime();
+        
+    dt = (t - time) * 0.001;
+    dt = dt > 0.04 ? 0.04 : dt;
+        
+    time = t;
     
     update(dt);
     draw();
@@ -171,12 +176,6 @@ function update(dt) {
         
     }
     
-    // if (mouse.y > 0.2 || mouse.y < -0.2) {
-    //     
-    //     rotate(mouse.y * 0.01, axis, up);
-    //     
-    // }
-    
     Body.update(dt);
     
 };
@@ -184,10 +183,9 @@ function update(dt) {
 function draw() {
     
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
-    
     gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
-    gl.uniform3f(shader.colorUniform, 0.4, 0.8, 0.4);
     
+    Floor.draw();
     Body.draw();
     
 };
@@ -247,11 +245,14 @@ function stop() {
 
 function reset() {
     
+    stop();
     Body.init();
     
 };
 
 var canvas, gl, shader,
+    
+    time,
     
     up, axis, 
     gravity,
@@ -266,7 +267,7 @@ var canvas, gl, shader,
 
 window.onload = function() {
 
-    var canvas = document.getElementById("canvas");
+    canvas = document.getElementById("canvas");
     
     if (!window.WebGLRenderingContext) {
         
@@ -299,6 +300,8 @@ window.onload = function() {
     gl.enable(gl.DEPTH_TEST);
     // gl.enable(gl.STENCIL_TEST);
     
+    gl.lineWidth(2);
+    
     
     shader = initShader(gl, "vertex-shader", "fragment-shader");
     
@@ -306,7 +309,6 @@ window.onload = function() {
     vec3.normalize(light);
     
     gl.uniform3fv(shader.lightUniform, light);
-    gl.uniform1f(shader.normalDirectionUniform, 1.0);
     
     
     var pMatrix = mat4.create();
@@ -315,8 +317,8 @@ window.onload = function() {
     gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
     
     
-    var center = [0, 0, -1],
-        eye = [10, 6, 4];
+    var center = [0, 0, -2],
+        eye = [10, 16, 8];
     
     up = [0, 0, 1];
     axis = [0, -1, 0];
@@ -329,10 +331,21 @@ window.onload = function() {
     
     Floor.init();
     
-    gravity = [0, 0, 0];//-9.81];
     
-    // draw();
+    gravity = [0, 0, 0];
+    time = (new Date()).getTime();
     
     render();
     
 };
+
+
+// 1 0 0
+// 0 1 0
+// 0 0 1
+// -1 0 0
+// 0 -1 0
+// 0 0 -1
+
+
+

@@ -77,8 +77,6 @@ var Body = {
             
         }
         
-        console.log(mergeFaces);
-        
         var cube = new Cube(position),
             cubeVertices = cube.vertices,
             faceTypes = [],
@@ -282,6 +280,8 @@ var Body = {
             
         }
         
+        gl.uniform3f(shader.colorUniform, 0.4, 0.8, 0.4);
+        
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.vertexAttribPointer(shader.positionAttribute, this.ITEM_SIZE, gl.FLOAT, false, 0, 0);
 
@@ -289,14 +289,8 @@ var Body = {
         gl.vertexAttribPointer(shader.normalAttribute, this.ITEM_SIZE, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-        gl.drawElements(this.drawEdges ? gl.LINES : gl.TRIANGLES, this.indexBuffer.itemCount, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(this.drawEdges ? gl.LINES : gl.TRIANGLES, this.indexArray.length, gl.UNSIGNED_SHORT, 0);
     
-    },
-    
-    calculateNormals : function() {
-        
-        
-        
     },
     
     updateArrays : function () {
@@ -309,6 +303,13 @@ var Body = {
 
             this.indexArray = new Uint16Array(this.edges.length * 2);
             
+            for (var i = 0; i < this.edges.length; i++) {
+
+                this.indexArray[i * 2] = i * 2;
+                this.indexArray[i * 2 + 1] = i * 2 + 1;
+
+            }
+            
         } else {
             
             this.vertexArray = new Float32Array(this.faces.length * 4 * this.ITEM_SIZE);
@@ -317,7 +318,22 @@ var Body = {
 
             this.indexArray = new Uint16Array(this.faces.length * 6);
             
+            for (var i = 0; i < this.faces.length; i++) {
+
+                var indices = this.drawIndices[this.faces[i].type < 3 ? 0 : 1];
+
+                for (var j = 0; j < 6; j++) {
+
+                    this.indexArray[i * 6 + j] = i * 4 + indices[j];
+
+                }
+
+            }
+            
         }
+        
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indexArray, gl.STATIC_DRAW);
         
     },
     
@@ -341,19 +357,14 @@ var Body = {
 
                 }
 
-                this.indexArray[i * 2] = i * 2;
-                this.indexArray[i * 2 + 1] = i * 2 + 1;
-
             }
-
-            this.indexBuffer.itemCount = this.edges.length * 2;
             
         } else {
             
             for (var i = 0; i < this.faces.length; i++) {
 
                 var face = this.faces[i],
-                    nor = this.faceNormals[face.type];
+                    nor = face.calculateNormal();
 
                 for (var j = 0; j < 4; j++) {
 
@@ -371,28 +382,15 @@ var Body = {
 
                 }
 
-                var indices = this.drawIndices[face.type < 3 ? 0 : 1];
-
-                for (var j = 0; j < 6; j++) {
-
-                    this.indexArray[i * 6 + j] = i * 4 + indices[j];
-
-                }
-
             }
-
-            this.indexBuffer.itemCount = this.faces.length * 6;
             
         }
         
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this.vertexArray, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, this.vertexArray, gl.DYNAMIC_DRAW);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this.normalArray, gl.STATIC_DRAW);
-
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indexArray, gl.STREAM_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, this.normalArray, gl.DYNAMIC_DRAW);
         
         this.shapeChanged = false;
         
@@ -405,15 +403,26 @@ var Body = {
         this.indexBuffer = gl.createBuffer();
         
         this.cubeVertices = [
-            [ 0.5,  0.5,  0.5],
-            [ 0.5, -0.5,  0.5],
-            [ 0.5, -0.5, -0.5],
-            [ 0.5,  0.5, -0.5],
-            [-0.5,  0.5,  0.5],
-            [-0.5, -0.5,  0.5],
-            [-0.5, -0.5, -0.5],
-            [-0.5,  0.5, -0.5]
+            [ 1, 1, 1 ],
+            [ 1, 0, 1 ],
+            [ 1, 0, 0 ],
+            [ 1, 1, 0 ],
+            [ 0, 1, 1 ],
+            [ 0, 0, 1 ],
+            [ 0, 0, 0 ],
+            [ 0, 1, 0 ]
         ];
+        
+        // this.cubeVertices = [
+        //     [ 0.5,  0.5,  0.5],
+        //     [ 0.5, -0.5,  0.5],
+        //     [ 0.5, -0.5, -0.5],
+        //     [ 0.5,  0.5, -0.5],
+        //     [-0.5,  0.5,  0.5],
+        //     [-0.5, -0.5,  0.5],
+        //     [-0.5, -0.5, -0.5],
+        //     [-0.5,  0.5, -0.5]
+        // ];
         
         this.drawIndices = [
         
