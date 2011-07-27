@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang=en>
+<head>
+    <meta name="author" content="Eberhard Gräther">
+    <title>egraether - soft</title>
+    
+    <style type="text/css">
+        * {
+            padding: 0; 
+            margin: 0; 
+            overflow: hidden;
+        }
+        #canvas {
+            z-index: -1;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+        p {
+            float : left;
+            font: 16px/24px Georgia, serif;
+            padding: 10px 30px;
+            background: #8AD48A;
+        }
+    </style>
+    
+    <script type="text/javascript">
+
+      // var _gaq = _gaq || [];
+      // _gaq.push(['_setAccount', 'UA-18871992-2']);
+      // _gaq.push(['_trackPageview']);
+      // 
+      // (function() {
+      //   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      //   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      //   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      // })();
+
+    </script>
+</head>
+<body>
+    <p>
+        soft by <a href="http://egraether.com">egraether</a> - mousedown to rotate - <a href="http://egraether.com/index.html#soft">more</a>
+    </p>
+    <p>
+        <input type="button" value="start" onclick="start()" />
+        <input type="button" value="stop" onclick="stop()" />
+        <input type="button" value="clear" onclick="reset()" />
+    </p>
+    <p>
+        <input type="button" value="wireframe" onclick="toggleWireframe()" />
+    </p>
+    <p>
+        x: <input type="text" size="3" id="x" value="0" />
+        y: <input type="text" size="3" id="y" value="0" />
+        z: <input type="text" size="3" id="z" value="1" />
+        <input type="button" value="cube" onclick="createCube()" />
+    </p>
+    <p>
+        <textarea rows="5" cols="20" id="area">
+1 0 0
+0 1 0
+-1 1 0
+        </textarea><br />
+        <input type="button" value="cubes" onclick="createCubes()" />
+    </p>
+
+    <canvas id="canvas">
+        <p style="padding-top: 50px">
+            Your browser does not support &lt;canvas&gt; and WebGL<br/>
+            <a href="http://get.webgl.org">http://get.webgl.org</a>
+        </p>
+    </canvas>
+
+<script id="vertex-shader" type="x-shader/x-vertex" charset="utf-8">
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    
+    uniform float uNormalDirection;
+    
+    attribute vec3 aPosition;
+    attribute vec3 aNormal;
+    
+    varying vec3 vNormal;
+    
+    void main( void ) {
+        
+        gl_Position = uPMatrix * uMVMatrix * vec4( aPosition, 1.0 );
+        
+        vNormal = aNormal * uNormalDirection;
+    
+    }
+    
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment" charset="utf-8">
+    
+    #ifdef GL_ES
+        precision highp float;
+    #endif
+    
+    uniform vec3 uColor;
+    uniform vec3 uLight;
+    
+    varying vec3 vNormal;
+    
+    const float alpha = 0.7;
+
+    void main(void) {
+        
+        float val = dot( vNormal, uLight ) * 0.4 + 0.6;
+        
+        gl_FragColor = vec4( uColor * val, alpha);
+    
+    }
+    
+</script>
+
+<script type="text/javascript" charset="utf-8" src="javascript/glMatrix.js"></script>
+<script type="text/javascript" charset="utf-8" src="javascript/soft/vertex.js"></script>
+<script type="text/javascript" charset="utf-8" src="javascript/soft/edge.js"></script>
+<script type="text/javascript" charset="utf-8" src="javascript/soft/face.js"></script>
+<script type="text/javascript" charset="utf-8" src="javascript/soft/body.js"></script>
+<script type="text/javascript" charset="utf-8" src="javascript/soft/floor.js"></script>
+<script type="text/javascript" charset="utf-8" src="javascript/soft/soft.js"></script>
+
+</body>
+</html>
