@@ -122,12 +122,33 @@ function onMouseMove(event) {
 
     mouse.x = event.clientX / canvas.width * 2 - 1;
     mouse.y = event.clientY / canvas.height * -2 + 1;
+    
+    var ray = getMouseRay(mouse, mvMatrix, pMatrix),
+        face = Body.getFaceInRay(ray.origin, ray.direction);
+    
+    if (face) {
+        
+        vec3.add(face.cube.position, Body.faceNormals[face.type], cube.position);
+        cube.visible = true;
+        
+    } else {
+        
+        cube.visible = false;
+        
+    }
 
 };
 
 function onMouseDown(event) {
 
     rotate = true;
+    
+    if (cube.visible) {
+        
+        Body.addCube(vec3.create(cube.position));
+        cube.visible = false;
+        
+    }
 
 };
 
@@ -136,6 +157,44 @@ function onMouseUp(event) {
     rotate = false;
 
 };
+
+var getMouseRay = (function() {
+    
+    var matrix = mat4.create(),
+        
+        near = new glMatrixArrayType(4),
+        far = new glMatrixArrayType(4),
+        
+        invertPoint = function(point) {
+            
+            mat4.multiplyVec4(matrix, point);
+            
+            point[0] /= point[3];
+            point[1] /= point[3];
+            point[2] /= point[3];
+            
+        };
+    
+    return function(mouse, mvMatrix, pMatrix) {
+    
+        mat4.multiply(pMatrix, mvMatrix, matrix);
+        mat4.inverse(matrix);
+        
+        near[0] = far[0] = mouse.x;
+        near[1] = far[1] = mouse.y;
+        
+        near[2] = 0; far[2] = 1;
+        near[3] = far[3] = 1;
+
+        invertPoint(near);
+        invertPoint(far);
+        
+        return {
+            origin : near,
+            direction : vec3.direction(far, near, far)
+        };
+    };
+})();
 
 function render() {
     
@@ -187,6 +246,12 @@ function draw() {
     
     Floor.draw();
     Body.draw();
+    
+    if (cube.visible) {
+        
+        cube.draw();
+        
+    }
     
 };
 
@@ -251,13 +316,15 @@ function reset() {
 };
 
 var canvas, gl, shader,
+
+    cube,
     
     time,
     
     up, axis, 
     gravity,
     
-    mvMatrix, rotMatrix = mat4.create(),
+    mvMatrix, pMatrix, rotMatrix = mat4.create(),
     matrixStack = [],
     
     mouse = {x : 0, y : 0},
@@ -292,12 +359,12 @@ window.onload = function() {
     gl.clearColor(0.9, 0.9, 0.9, 1.0);
     gl.viewport(0, 0, canvas.width, canvas.height);
     
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     // gl.enable(gl.BLEND);
     
     gl.enable(gl.CULL_FACE);
-    
     gl.enable(gl.DEPTH_TEST);
+    
     // gl.enable(gl.STENCIL_TEST);
     
     gl.lineWidth(2);
@@ -311,20 +378,23 @@ window.onload = function() {
     gl.uniform3fv(shader.lightUniform, light);
     
     
-    var pMatrix = mat4.create();
+    pMatrix = mat4.create();
     mat4.perspective(45, canvas.width / canvas.height, 0.1, 1000, pMatrix);
     
     gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
     
     
-    var center = [0, 0, -2],
-        eye = [10, 16, 8];
+    var center = [0, 0, -1],
+        eye = [10, 8, 4];
     
     up = [0, 0, 1];
     axis = [0, -1, 0];
     
     mvMatrix = mat4.lookAt(eye, center, up);
     
+    Cube.init();
+    cube = new Cube([0, 0, 0]);
+    cube.visible = false;
     
     Body.initBuffers();
     Body.init();
@@ -338,14 +408,3 @@ window.onload = function() {
     render();
     
 };
-
-
-// 1 0 0
-// 0 1 0
-// 0 0 1
-// -1 0 0
-// 0 -1 0
-// 0 0 -1
-
-
-

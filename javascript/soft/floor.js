@@ -58,8 +58,6 @@ var Floor = {
             
         }
         
-        console.log(lineVertices, lineIndices);
-        
         this.lineBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.lineBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lineVertices), gl.STATIC_DRAW);
@@ -76,18 +74,6 @@ var Floor = {
     
     draw : function() {
         
-        gl.uniform3f(shader.colorUniform, 1.0, 1.0, 1.0);
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.lineBuffer);
-        gl.vertexAttribPointer(shader.positionAttribute, 3, gl.FLOAT, false, 0, 0);
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.lineNormalBuffer);
-        gl.vertexAttribPointer(shader.normalAttribute, 3, gl.FLOAT, false, 0, 0);
-
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.lineIndexBuffer);
-        gl.drawElements(gl.LINES, 8 * this.size, gl.UNSIGNED_SHORT, 0);
-        
-        
         gl.uniform3f(shader.colorUniform, 0.7, 0.7, 0.7);
         
         gl.bindBuffer(gl.ARRAY_BUFFER, this.cornerBuffer);
@@ -98,6 +84,26 @@ var Floor = {
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.cornerIndexBuffer);
         gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+        
+        
+        gl.uniform3f(shader.colorUniform, 1.0, 0.5, 0.5);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.lineBuffer);
+        gl.vertexAttribPointer(shader.positionAttribute, 3, gl.FLOAT, false, 0, 0);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.lineNormalBuffer);
+        gl.vertexAttribPointer(shader.normalAttribute, 3, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.lineIndexBuffer);
+        gl.drawElements(gl.LINES, 8 * this.size, gl.UNSIGNED_SHORT, 0);
+        
+    },
+    
+    line: function(a, b) {
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.lineBuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array([a[0], a[1], a[2], b[0], b[1], b[2]]));
+        
         
     }
     

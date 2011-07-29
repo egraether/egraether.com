@@ -11,6 +11,7 @@ var Body = {
     vertices : null,
     edges : null,
     
+    color : 3,
     
     // buffers
     
@@ -190,14 +191,17 @@ var Body = {
                 var face = new Face(i),
                     faceVertices = this.faceVertices[i];
 
-                this.faces.push(face);
-                cube.faces[i] = face;
-
                 for (var j = 0; j < 4; j++) {
 
                     face.vertices.push(cubeVertices[faceVertices[j]]);
 
                 }
+                
+                face.calculateMid();
+                
+                this.faces.push(face);
+                cube.faces[i] = face;
+                face.cube = cube;
                 
             }
             
@@ -280,7 +284,7 @@ var Body = {
             
         }
         
-        gl.uniform3f(shader.colorUniform, 0.4, 0.8, 0.4);
+        gl.uniform3fv(shader.colorUniform, Vertex.colors[this.color]);
         
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.vertexAttribPointer(shader.positionAttribute, this.ITEM_SIZE, gl.FLOAT, false, 0, 0);
@@ -381,7 +385,7 @@ var Body = {
                     this.normalArray[x + 2] = nor[2];
 
                 }
-
+                
             }
             
         }
@@ -393,6 +397,38 @@ var Body = {
         gl.bufferData(gl.ARRAY_BUFFER, this.normalArray, gl.DYNAMIC_DRAW);
         
         this.shapeChanged = false;
+        
+    },
+    
+    getFaceInRay : function(origin, direction) {
+        
+        var min = Infinity,
+            dist,
+            nearest = null,
+            vector = vec3.create();
+        
+        for (var i = 0; i < this.faces.length; i++) {
+            
+            var face = this.faces[i],
+                dist = face.distanceToRay(origin, direction);
+            
+            if (dist < 0.5 && face.intersectsRay(origin, direction)) {
+                
+                vec3.subtract(face.mid, origin, vector);
+                len = vec3.dot(vector, vector);
+                
+                if (len < min) {
+                    
+                    nearest = face;
+                    min = len;
+                    
+                }
+                
+            }
+            
+        }
+        
+        return nearest;
         
     },
     
@@ -412,17 +448,6 @@ var Body = {
             [ 0, 0, 0 ],
             [ 0, 1, 0 ]
         ];
-        
-        // this.cubeVertices = [
-        //     [ 0.5,  0.5,  0.5],
-        //     [ 0.5, -0.5,  0.5],
-        //     [ 0.5, -0.5, -0.5],
-        //     [ 0.5,  0.5, -0.5],
-        //     [-0.5,  0.5,  0.5],
-        //     [-0.5, -0.5,  0.5],
-        //     [-0.5, -0.5, -0.5],
-        //     [-0.5,  0.5, -0.5]
-        // ];
         
         this.drawIndices = [
         
@@ -457,25 +482,12 @@ var Body = {
         ];
         
         this.faceNormals = [
-        
-            // front
-            [1, 0, 0],
-            
-            // right
-            [0, 1, 0],
-            
-            // top
-            [0, 0, 1],
-            
-            // back
-            [-1, 0, 0],
-            
-            // left
-            [0, -1, 0],
-            
-            // bottom
-            [0, 0, -1]
-        
+            [ 1, 0, 0 ],
+            [ 0, 1, 0 ],
+            [ 0, 0, 1 ],
+            [ -1, 0, 0 ],
+            [ 0, -1, 0 ],
+            [ 0, 0, -1 ]
         ];
         
         this.straightEdges = [

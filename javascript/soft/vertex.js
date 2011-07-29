@@ -17,6 +17,17 @@ Vertex.collisionNormal = [0, 0, -1];
 Vertex.vector = vec3.create();
 Vertex.acceleration = vec3.create();
 
+Vertex.colors = [
+    
+    [0.4, 0.8, 0.4],
+    [0.8, 0.4, 0.4],
+    [0.4, 0.4, 0.8],
+    [0.8, 0.4, 0.8],
+    [0.8, 0.8, 0.4],
+    [0.4, 0.8, 0.8]
+
+];
+
 Vertex.prototype = {
     
     update : function(dt) {
