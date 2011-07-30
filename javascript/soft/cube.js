@@ -1,8 +1,29 @@
 var Cube = function(position) {
     
     this.position = position;
+    
     this.faces = [];
     this.vertices = [];
+    
+    this.straightEdges = [];
+    
+    for (var i = 0; i < 6; i++) {
+        
+        this.faces[i] = false;
+        
+    }
+    
+    for (var i = 0; i < 8; i++) {
+        
+        this.vertices[i] = false;
+        
+    }
+    
+    for (var i = 0; i < 12; i++) {
+        
+        this.straightEdges[i] = false;
+        
+    }
     
 };
 

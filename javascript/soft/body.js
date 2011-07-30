@@ -70,68 +70,16 @@ var Body = {
             
         }
         
-        var mergeFaces = this.getMergeFaces(position);
-        
-        if (this.faces.length && !mergeFaces.length) {
-            
-            return;
-            
-        }
-        
         var cube = new Cube(position),
-            cubeVertices = cube.vertices,
-            faceTypes = [],
-            vertexIndices = [],
-            straightEdgeIndices = [];
-            
+            cubeVertices = cube.vertices;
         
-        for (var i = 0; i < 12; i++) {
-            
-            straightEdgeIndices.push(true);
-            
-            if (i < 8) {
-                
-                vertexIndices.push(true);
-                
-            }
-            
-            if (i < 6) {
-                
-                faceTypes.push(true);
-                
-            }
-            
-        }
-            
-        for (var i = 0; i < mergeFaces.length; i++) {
-            
-            var face = mergeFaces[i],
-                compFaceType = (face.type + 3) % 6,
-                compFaceVertices = this.faceVertices[compFaceType];
-                
-            faceTypes[compFaceType] = false;
-            cube.faces[compFaceType] = face;
-
-            for (var j = 0; j < 4; j++) {
-                
-                var comp = compFaceVertices[j];
-                
-                if (vertexIndices[comp]) {
-                    
-                    cubeVertices[comp] = face.vertices[j];
-                    vertexIndices[comp] = false;
-                    
-                }
-                
-            }
-
-        }
+        this.mergeNeighbors(cube);
         
         for (var i = 0; i < 8; i++) {
             
-            if (vertexIndices[i]) {
+            if (!cubeVertices[i]) {
                 
-                var vertex = new Vertex(vec3.add(this.cubeVertices[i], position, []));
+                var vertex = new Vertex(vec3.add(this.cubeVertices[i], position, vec3.create()));
                 
                 this.vertices.push(vertex);
                 cubeVertices[i] = vertex;
@@ -140,31 +88,9 @@ var Body = {
             
         }
         
-        for (var i = 0; i < 6; i++) {
-            
-            if (!faceTypes[i]) {
-                
-                var straightEdges = this.straightEdgeIndices[i];
-
-                for (var j = 0; j < 4; j++) {
-
-                    var index = straightEdges[i];
-
-                    if (straightEdgeIndices[index]) {
-
-                        straightEdgeIndices[index] = false;
-
-                    }
-
-                }
-                
-            }
-            
-        }
-        
         for (var i = 0; i < 12; i++) {
         
-            if (straightEdgeIndices[i]) {
+            if (!cube.straightEdges[i]) {
                 
                 this.edges.push(new Edge(
                     cubeVertices[this.straightEdges[i * 2]], 
@@ -177,7 +103,7 @@ var Body = {
         
         for (var i = 0; i < 6; i++) {
             
-            if (faceTypes[i]) {
+            if (!cube.faces[i]) {
                 
                 for (var j = 0; j < 2; j++) {
 
@@ -198,6 +124,7 @@ var Body = {
                 }
                 
                 face.calculateMid();
+                face.calculateNormal();
                 
                 this.faces.push(face);
                 cube.faces[i] = face;
@@ -221,35 +148,112 @@ var Body = {
         
     },
     
-    getMergeFaces : function(position) {
+    mergeNeighbors : function(cube) {
         
-        var mergeFaces = [],
-            pos = vec3.create(),
-            offset = 1,
-            cube;
+        var pos = vec3.create(),
+            offset = vec3.create(),
+            neighbor,
+            dot;
+        
+        for (var i = -1; i < 2; i++) {
+            
+            offset[0] = i;
+            
+            for (var j = -1; j < 2; j++) {
+                
+                offset[1] = j;
+
+                for (var k = -1; k < 2; k++) {
+                    
+                    if (!i && !j && !k) {
+                        
+                        continue;
+                        
+                    }
+                    
+                    offset[2] = k;
+
+                    vec3.add(cube.position, offset, pos);
+                    
+                    neighbor = this.cubes[vec3.str(pos)];
+                    
+                    if (neighbor) {
+                        
+                        this.mergeNeighbor(cube, neighbor, offset);
+                        
+                    }
+                }
+            }
+        }
+    },
+    
+    mergeNeighbor : function(cube, neighbor, offset) {
+        
+        var dot = vec3.dot(offset, offset),
+            vertexIndices;
+        
+        if (dot == 1) {
+            
+            console.log("face");
+            this.mergeFace(cube, neighbor, offset);
+            
+        } else if (dot == 2) {
+            
+            console.log("edge");
+            cube.straightEdges[this.straightEdgeIndexPerOffset[vec3.str(offset)]] = true;
+            
+            vertexIndices = this.vertexIndexPerOffset[vec3.str(offset)];
+            cube.vertices[vertexIndices[0]] = neighbor.vertices[vertexIndices[1]];
+            cube.vertices[vertexIndices[2]] = neighbor.vertices[vertexIndices[3]];
+            
+        } else {
+            
+            console.log("vertex");
+            vertexIndices = this.vertexIndexPerOffset[vec3.str(offset)];
+            cube.vertices[vertexIndices[0]] = neighbor.vertices[vertexIndices[1]];
+            
+        }
+        
+    },
+    
+    mergeFace : function(cube, neighbor, offset) {
+        
+        var orientation = -1;
         
         for (var i = 0; i < 6; i++) {
             
-            vec3.set(position, pos);
-            pos[i % 3] += offset;
-            
-            cube = this.cubes[vec3.str(pos)];
-            
-            if (cube) {
+            if (offset[i % 3] == orientation) {
                 
-                mergeFaces.push(cube.faces[(i + 3) % 6]);
+                var face = neighbor.faces[i],
+                    faceType = (face.type + 3) % 6,
+                    faceVertices = this.faceVertices[faceType],
+                    straightEdges = this.straightEdgeIndices[faceType];
+
+                cube.faces[faceType] = face;
+
+                for (var j = 0; j < 4; j++) {
+
+                    cube.vertices[faceVertices[j]] = face.vertices[j];
+
+                }
+                
+                for (var j = 0; j < 4; j++) {
+                    
+                    cube.straightEdges[straightEdges[j]] = false;
+
+                }
+                
+                break;
                 
             }
             
             if (i == 2) {
                 
-                offset = -1;
+                orientation = 1;
                 
             }
             
         }
-        
-        return mergeFaces;
         
     },
 
@@ -459,6 +463,35 @@ var Body = {
             
         ];
         
+        this.vertexIndexPerOffset = {
+            
+            "[1, 1, 1]" : [0, 6],
+            "[-1, 1, 1]" : [4, 2],
+            "[-1, -1, 1]" : [5, 3],
+            "[1, -1, 1]" : [1, 7],
+            
+            "[1, 1, -1]" : [3, 5],
+            "[-1, 1, -1]" : [7, 1],
+            "[-1, -1, -1]" : [6, 0],
+            "[1, -1, -1]" : [2, 4],
+            
+            "[1, 1, 0]" : [0, 5, 3, 6],
+            "[-1, 1, 0]" : [4, 1, 7, 2],
+            "[-1, -1, 0]" : [5, 0, 6, 3],
+            "[1, -1, 0]" : [1, 4, 2, 7],
+            
+            "[1, 0, 1]" : [0, 7, 1, 6],
+            "[-1, 0, 1]" : [4, 3, 5, 2],
+            "[-1, 0, -1]" : [6, 1, 7, 0],
+            "[1, 0, -1]" : [2, 5, 3, 4],
+            
+            "[0, 1, 1]" : [0, 2, 4, 6],
+            "[0, -1, 1]" : [1, 3, 5, 7],
+            "[0, -1, -1]" : [2, 0, 6, 4],
+            "[0, 1, -1]" : [3, 1, 7, 5]
+            
+        };
+        
         this.faceVertices = [
         
             // front
@@ -528,6 +561,25 @@ var Body = {
             [2, 6, 10, 11]
         
         ];
+        
+        this.straightEdgeIndexPerOffset = {
+            
+            "[1, 1, 0]" : 3,
+            "[-1, 1, 0]" : 7,
+            "[-1, -1, 0]" : 5,
+            "[1, -1, 0]" : 1,
+            
+            "[1, 0, 1]" : 0,
+            "[-1, 0, 1]" : 4,
+            "[-1, 0, -1]" : 6,
+            "[1, 0, -1]" : 2,
+            
+            "[0, 1, 1]" : 8,
+            "[0, -1, 1]" : 9,
+            "[0, -1, -1]" : 10,
+            "[0, 1, -1]" : 11
+            
+        };
         
         this.crossEdges = [
         
