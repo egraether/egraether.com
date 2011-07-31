@@ -83,18 +83,14 @@ function initShader(gl, vertexShaderID, fragmentShaderID) {
     
     var shader = loadShader(gl, vertexShaderID, fragmentShaderID);
     gl.useProgram(shader);
-    
+
     shader.mvMatrixUniform = gl.getUniformLocation(shader, "uMVMatrix");
     shader.pMatrixUniform = gl.getUniformLocation(shader, "uPMatrix");
-    
+
     shader.colorUniform = gl.getUniformLocation(shader, "uColor");
-    shader.lightUniform = gl.getUniformLocation(shader, "uLight");
-    
+
     shader.positionAttribute = gl.getAttribLocation(shader, "aPosition");
     gl.enableVertexAttribArray(shader.positionAttribute);
-    
-    shader.normalAttribute = gl.getAttribLocation(shader, "aNormal");
-    gl.enableVertexAttribArray(shader.normalAttribute);
     
     return shader;
     
@@ -247,21 +243,25 @@ function update(dt) {
     
 function draw() {
     
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+    
     gl.useProgram(shader);
     
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
+    gl.uniform1f(shader.colorMixUniform, 0.0);
     
     Floor.draw();
-    Body.draw();
     
     if (cube.visible) {
         
-        gl.useProgram(shader);
         gl.uniform3fv(shader.colorUniform, Vertex.colors[Body.color]);
+        gl.uniform1f(shader.colorMixUniform, 1.0);
+        
         cube.drawWireframe();
         
     }
+    
+    Body.draw();
     
 };
 
@@ -302,6 +302,17 @@ function createCubes() {
 function toggleWireframe() {
     
     Body.drawEdges = !Body.drawEdges;
+    
+};
+
+function switchColor(index) {
+    
+    var nodes = document.querySelector("#colors").children;
+    
+    nodes[Body.color].style.borderColor = "black";
+    nodes[index].style.borderColor = "white";
+    
+    Body.color = index;
     
 };
 
@@ -362,20 +373,17 @@ window.onload = function() {
     canvas.onmousedown = onMouseDown;
     canvas.onmouseup = onMouseUp;
     canvas.onmousemove = onMouseMove;
+    
+    switchColor(1);
 
 
-    gl = canvas.getContext("experimental-webgl", {stencil: true});
+    gl = canvas.getContext("experimental-webgl");
 
     gl.clearColor(0.9, 0.9, 0.9, 1.0);
     gl.viewport(0, 0, canvas.width, canvas.height);
     
-    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    // gl.enable(gl.BLEND);
-    
     gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
-    
-    // gl.enable(gl.STENCIL_TEST);
     
     gl.lineWidth(2);
     
@@ -397,11 +405,12 @@ window.onload = function() {
     
     mvMatrix = mat4.lookAt(eye, center, up);
     
+    
     Cube.init();
     cube = new Cube([0, 0, 0]);
     cube.visible = false;
     
-    Body.initShader(gl, "body-vertex-shader", "body-fragment-shader");
+    Body.initShader();
     Body.initBuffers();
     Body.init();
     

@@ -7,32 +7,21 @@ var Floor = {
         
         var s = this.size,
             h = this.height,
-            lineVertices = [],
-            lineIndices = [];
+            vertices = [];
         
         for (var i = 0; i <= 2 * s; i++) {
             
-            lineVertices.push(-s + i, -s, h);
-            lineVertices.push(-s + i, s, h);
+            vertices.push(-s + i, -s, h);
+            vertices.push(-s + i, s, h);
             
-            lineVertices.push(-s, -s + i, h);
-            lineVertices.push(s, -s + i, h);
-            
-        }
-        
-        for (var i = 0; i < 8 * s + 4; i++) {
-            
-            lineIndices.push(i);
+            vertices.push(-s, -s + i, h);
+            vertices.push(s, -s + i, h);
             
         }
         
-        this.lineBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.lineBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lineVertices), gl.STATIC_DRAW);
-        
-        this.lineIndexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.lineIndexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(lineIndices), gl.STATIC_DRAW);
+        this.vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
         
     },
     
@@ -40,11 +29,9 @@ var Floor = {
         
         gl.uniform3f(shader.colorUniform, 0.7, 0.7, 0.7);
         
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.lineBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.vertexAttribPointer(shader.positionAttribute, 3, gl.FLOAT, false, 0, 0);
-        
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.lineIndexBuffer);
-        gl.drawElements(gl.LINES, 8 * this.size + 4, gl.UNSIGNED_SHORT, 0);
+        gl.drawArrays(gl.LINES, 0, 8 * this.size + 4);
         
     }
 };

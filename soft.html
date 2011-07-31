@@ -6,9 +6,8 @@
     
     <style type="text/css">
         * {
-            padding: 0; 
-            margin: 0; 
-            overflow: hidden;
+            padding: 0;
+            margin: 0;
         }
         #canvas {
             z-index: -1;
@@ -20,7 +19,17 @@
             float : left;
             font: 16px/24px Georgia, serif;
             padding: 10px 30px;
-            background: #8AD48A;
+            background: #CCCCCC;
+        }
+        span {
+            float: left;
+            display: block;
+            height: 16px;
+            width: 16px;
+            margin: 3px 5px;
+        }
+        #colors > span {
+            border: 1px solid black;
         }
     </style>
     
@@ -50,6 +59,14 @@
     <p>
         <input type="button" value="wireframe" onclick="toggleWireframe()" />
     </p>
+    <p id="colors">
+        <span style="background: #CC6666;" onclick="switchColor(0)"></span>
+        <span style="background: #66CC66;" onclick="switchColor(1)"></span>
+        <span style="background: #6666CC;" onclick="switchColor(2)"></span>
+        <span style="background: #CCCC66;" onclick="switchColor(3)"></span>
+        <span style="background: #66CCCC;" onclick="switchColor(4)"></span>
+        <span style="background: #CC66CC;" onclick="switchColor(5)"></span>
+    </p>
     <!-- <p>
         x: <input type="text" size="3" id="x" value="0" />
         y: <input type="text" size="3" id="y" value="0" />
@@ -76,31 +93,31 @@
 
     uniform mat4 uMVMatrix;
     uniform mat4 uPMatrix;
-    
+
     attribute vec3 aPosition;
-    
+
     void main( void ) {
-        
+
         gl_Position = uPMatrix * uMVMatrix * vec4( aPosition, 1.0 );
-    
+
     }
-    
+
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment" charset="utf-8">
-    
+
     #ifdef GL_ES
         precision highp float;
     #endif
-    
+
     uniform vec3 uColor;
-    
+
     void main(void) {
-        
-        gl_FragColor = vec4( uColor, 1.0);
-    
+
+        gl_FragColor = vec4( uColor, 1.0 );
+
     }
-    
+
 </script>
 
 <script id="body-vertex-shader" type="x-shader/x-vertex" charset="utf-8">
@@ -114,16 +131,13 @@
     attribute vec3 aNormal;
     attribute vec3 aColor;
     
-    varying vec3 vColor;
-    varying float vLightVal;
+    varying vec4 vColor;
     
     void main( void ) {
     
         gl_Position = uPMatrix * uMVMatrix * vec4( aPosition, 1.0 );
         
-        vLightVal = dot( aNormal, uLight ) * 0.2 + 0.8;
-        
-        vColor = aColor;
+        vColor = vec4( aColor * ( dot( aNormal, uLight ) * 0.2 + 0.8 ), 1.0);
     
     }
     
@@ -135,13 +149,12 @@
         precision highp float;
     #endif
     
-    varying vec3 vColor;
-    varying float vLightVal;
-
+    varying vec4 vColor;
+    
     void main(void) {
         
-        gl_FragColor = vec4( vColor * vLightVal, 1.0);
-    
+        gl_FragColor = vColor;
+        
     }
     
 </script>

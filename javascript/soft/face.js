@@ -77,8 +77,6 @@ Face.prototype = {
         
     },
     
-    // http://www.blackpawn.com/texts/pointinpoly/default.html
-    
     intersectsRay : function(origin, direction) {
         
         var nor = this.normal,
@@ -107,8 +105,6 @@ Face.prototype = {
                 
                 u = (dotbb * dotap - dotab * dotbp) * invDenom,
                 v = (dotaa * dotbp - dotab * dotap) * invDenom;
-                
-            
             
             return (u > 0) && (v > 0) && (u < 1) && (v < 1);
             
