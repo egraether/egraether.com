@@ -18,6 +18,12 @@ if ( !window.requestAnimationFrame ) {
 
 }
 
+function map(x, minA, maxA, minB, maxB) {
+    
+    return (x - minA) / (maxA - minA) * (maxB - minB) + minB;
+    
+};
+
 function loadShader(gl, vertexShaderID, fragmentShaderID) {
 
     var vertexShader = loadShaderScript(gl, vertexShaderID),
@@ -241,6 +247,8 @@ function update(dt) {
     
 function draw() {
     
+    gl.useProgram(shader);
+    
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
     
@@ -249,7 +257,9 @@ function draw() {
     
     if (cube.visible) {
         
-        cube.draw();
+        gl.useProgram(shader);
+        gl.uniform3fv(shader.colorUniform, Vertex.colors[Body.color]);
+        cube.drawWireframe();
         
     }
     
@@ -372,11 +382,6 @@ window.onload = function() {
     
     shader = initShader(gl, "vertex-shader", "fragment-shader");
     
-    var light = [3.0, 4.0, 5.0];
-    vec3.normalize(light);
-    
-    gl.uniform3fv(shader.lightUniform, light);
-    
     
     pMatrix = mat4.create();
     mat4.perspective(45, canvas.width / canvas.height, 0.1, 1000, pMatrix);
@@ -396,6 +401,7 @@ window.onload = function() {
     cube = new Cube([0, 0, 0]);
     cube.visible = false;
     
+    Body.initShader(gl, "body-vertex-shader", "body-fragment-shader");
     Body.initBuffers();
     Body.init();
     

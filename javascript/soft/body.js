@@ -79,7 +79,10 @@ var Body = {
             
             if (!cubeVertices[i]) {
                 
-                var vertex = new Vertex(vec3.add(this.cubeVertices[i], position, vec3.create()));
+                var vertex = new Vertex(
+                    vec3.add(this.cubeVertices[i], position, vec3.create()),
+                    Vertex.colors[this.color]
+                );
                 
                 this.vertices.push(vertex);
                 cubeVertices[i] = vertex;
@@ -128,7 +131,9 @@ var Body = {
                 
                 this.faces.push(face);
                 cube.faces[i] = face;
+                
                 face.cube = cube;
+                face.color = Vertex.colors[this.color];
                 
             }
             
@@ -144,6 +149,8 @@ var Body = {
         }
         
         this.cubes[vec3.str(position)] = cube;
+        
+        this.color = (this.color + 1) % Vertex.colors.length;
         this.geometryChanged = true;
         
     },
@@ -194,12 +201,10 @@ var Body = {
         
         if (dot == 1) {
             
-            console.log("face");
             this.mergeFace(cube, neighbor, offset);
             
         } else if (dot == 2) {
             
-            console.log("edge");
             cube.straightEdges[this.straightEdgeIndexPerOffset[vec3.str(offset)]] = true;
             
             vertexIndices = this.vertexIndexPerOffset[vec3.str(offset)];
@@ -208,7 +213,6 @@ var Body = {
             
         } else {
             
-            console.log("vertex");
             vertexIndices = this.vertexIndexPerOffset[vec3.str(offset)];
             cube.vertices[vertexIndices[0]] = neighbor.vertices[vertexIndices[1]];
             
@@ -288,13 +292,18 @@ var Body = {
             
         }
         
-        gl.uniform3fv(shader.colorUniform, Vertex.colors[this.color]);
+        gl.useProgram(this.shader);
+        
+        gl.uniformMatrix4fv(this.shader.mvMatrixUniform, false, mvMatrix);
         
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        gl.vertexAttribPointer(shader.positionAttribute, this.ITEM_SIZE, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(this.shader.positionAttribute, this.ITEM_SIZE, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
-        gl.vertexAttribPointer(shader.normalAttribute, this.ITEM_SIZE, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(this.shader.normalAttribute, this.ITEM_SIZE, gl.FLOAT, false, 0, 0);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
+        gl.vertexAttribPointer(this.shader.colorAttribute, this.ITEM_SIZE, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
         gl.drawElements(this.drawEdges ? gl.LINES : gl.TRIANGLES, this.indexArray.length, gl.UNSIGNED_SHORT, 0);
@@ -308,6 +317,8 @@ var Body = {
             this.vertexArray = new Float32Array(this.edges.length * 2 * this.ITEM_SIZE);
 
             this.normalArray = new Float32Array(this.edges.length * 2 * this.ITEM_SIZE);
+
+            this.colorArray = new Float32Array(this.edges.length * 2 * this.ITEM_SIZE);
 
             this.indexArray = new Uint16Array(this.edges.length * 2);
             
@@ -323,6 +334,8 @@ var Body = {
             this.vertexArray = new Float32Array(this.faces.length * 4 * this.ITEM_SIZE);
 
             this.normalArray = new Float32Array(this.faces.length * 4 * this.ITEM_SIZE);
+
+            this.colorArray = new Float32Array(this.faces.length * 4 * this.ITEM_SIZE);
 
             this.indexArray = new Uint16Array(this.faces.length * 6);
             
@@ -357,11 +370,16 @@ var Body = {
 
                     var vertex = j == 0 ? edge.to : edge.from,
                         pos = vertex.position,
+                        col = vertex.color,
                         x = i * 6 + j * 3;
 
                     this.vertexArray[x] = pos[0];
                     this.vertexArray[x + 1] = pos[1];
                     this.vertexArray[x + 2] = pos[2];
+                    
+                    this.colorArray[x] = col[0];
+                    this.colorArray[x + 1] = col[1];
+                    this.colorArray[x + 2] = col[2];
 
                 }
 
@@ -372,12 +390,14 @@ var Body = {
             for (var i = 0; i < this.faces.length; i++) {
 
                 var face = this.faces[i],
+                    col = face.color,
                     nor = face.calculateNormal();
 
                 for (var j = 0; j < 4; j++) {
 
                     var vertex = face.vertices[j],
                         pos = vertex.position,
+                        // col = vertex.color,
                         x = i * 12 + j * 3;
 
                     this.vertexArray[x] = pos[0];
@@ -387,6 +407,10 @@ var Body = {
                     this.normalArray[x] = nor[0];
                     this.normalArray[x + 1] = nor[1];
                     this.normalArray[x + 2] = nor[2];
+
+                    this.colorArray[x] = col[0];
+                    this.colorArray[x + 1] = col[1];
+                    this.colorArray[x + 2] = col[2];
 
                 }
                 
@@ -399,6 +423,9 @@ var Body = {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, this.normalArray, gl.DYNAMIC_DRAW);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, this.colorArray, gl.DYNAMIC_DRAW);
         
         this.shapeChanged = false;
         
@@ -436,10 +463,39 @@ var Body = {
         
     },
     
+    initShader : function(gl, vertexShaderID, fragmentShaderID) {
+
+        this.shader = loadShader(gl, vertexShaderID, fragmentShaderID);
+        gl.useProgram(this.shader);
+
+        this.shader.mvMatrixUniform = gl.getUniformLocation(this.shader, "uMVMatrix");
+        this.shader.pMatrixUniform = gl.getUniformLocation(this.shader, "uPMatrix");
+
+        this.shader.lightUniform = gl.getUniformLocation(this.shader, "uLight");
+
+        this.shader.positionAttribute = gl.getAttribLocation(this.shader, "aPosition");
+        gl.enableVertexAttribArray(this.shader.positionAttribute);
+
+        this.shader.normalAttribute = gl.getAttribLocation(this.shader, "aNormal");
+        gl.enableVertexAttribArray(this.shader.normalAttribute);
+        
+        this.shader.colorAttribute = gl.getAttribLocation(this.shader, "aColor");
+        gl.enableVertexAttribArray(this.shader.colorAttribute);
+        
+        gl.uniformMatrix4fv(this.shader.pMatrixUniform, false, pMatrix);
+        
+        var light = [3.0, 4.0, 5.0];
+        vec3.normalize(light);
+        
+        gl.uniform3fv(this.shader.lightUniform, light);
+        
+    },
+    
     initBuffers : function() {
         
         this.vertexBuffer = gl.createBuffer();
         this.normalBuffer = gl.createBuffer();
+        this.colorBuffer = gl.createBuffer();
         this.indexBuffer = gl.createBuffer();
         
         this.cubeVertices = [

@@ -1,4 +1,6 @@
-var Vertex = function(position) {
+var Vertex = function(position, color) {
+    
+    this.color = color;
     
     this.position = vec3.create(position);
     this.origin = position;

@@ -39,11 +39,29 @@ Cube.prototype = {
         gl.bindBuffer(gl.ARRAY_BUFFER, Cube.vertexBuffer);
         gl.vertexAttribPointer(shader.positionAttribute, 3, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, Cube.normalBuffer);
-        gl.vertexAttribPointer(shader.normalAttribute, 3, gl.FLOAT, false, 0, 0);
+        // gl.bindBuffer(gl.ARRAY_BUFFER, Cube.normalBuffer);
+        // gl.vertexAttribPointer(shader.normalAttribute, 3, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Cube.indexBuffer);
-        gl.drawElements(gl.TRIANGLES, Cube.indexCount, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, Cube.indexBuffer.count, gl.UNSIGNED_SHORT, 0);
+        
+        popMatrix();
+        
+    },
+    
+    drawWireframe : function() {
+        
+        pushMatrix();
+        
+        mat4.translate(mvMatrix, this.position);
+        
+        gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, Cube.vertexBuffer);
+        gl.vertexAttribPointer(shader.positionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Cube.lineIndexBuffer);
+        gl.drawElements(gl.LINES, Cube.lineIndexBuffer.count, gl.UNSIGNED_SHORT, 0);
         
         popMatrix();
         
@@ -95,7 +113,7 @@ Cube.init = function() {
     
     for (var i = 0; i < vertices.length; i++) {
         
-        vertices[i] = (vertices[i] + 1) / 2;
+        vertices[i] = map(vertices[i], -1, 1, 0.15, 0.85);
         
     }
 
@@ -161,6 +179,14 @@ Cube.init = function() {
         20, 21, 22, 20, 22, 23
 
     ];
+    
+    var lineIndices = [
+
+        0, 1, 1, 2, 2, 3, 3, 0,
+        4, 5, 5, 6, 6, 7, 7, 4,
+        0, 4, 1, 7, 2, 6, 3, 5
+
+    ];
 
     this.vertexBuffer = gl.createBuffer();
 
@@ -177,6 +203,13 @@ Cube.init = function() {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STREAM_DRAW);
 
-    this.indexCount = indices.length;
+    this.indexBuffer.count = indices.length;
+    
+    this.lineIndexBuffer = gl.createBuffer();
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.lineIndexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(lineIndices), gl.STREAM_DRAW);
+    
+    this.lineIndexBuffer.count = lineIndices.length;
     
 };
