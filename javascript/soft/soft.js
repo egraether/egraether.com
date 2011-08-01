@@ -120,24 +120,53 @@ function popMatrix() {
     
 }
 
+function getMouse(event) {
+    
+    return {
+        x : event.clientX / canvas.width * 2 - 1,
+        y : event.clientY / canvas.height * -2 + 1
+    };
+    
+};
+
 function onMouseMove(event) {
 
-    mouse.x = event.clientX / canvas.width * 2 - 1;
-    mouse.y = event.clientY / canvas.height * -2 + 1;
+    var m = getMouse(event);
     
-    var ray = getMouseRay(mouse, mvMatrix, pMatrix),
-        face = Body.getFaceInRay(ray.origin, ray.direction);
-    
-    if (face) {
+    if (rotate) {
         
-        vec3.add(face.cube.position, Body.faceNormals[face.type], cube.position);
-        cube.visible = true;
+        mat4.identity(rotMatrix);
+        mat4.rotateZ(rotMatrix, (m.x - mouse.x) * 2);
+        
+        mat4.multiply(mvMatrix, rotMatrix);
+        
+        mat4.inverse(rotMatrix);
+        mat4.multiplyVec3(rotMatrix, axis);
+        
+        mat4.identity(rotMatrix);
+        mat4.rotate(rotMatrix, (m.y - mouse.y) * 2, axis);
+        
+        mat4.multiply(mvMatrix, rotMatrix);
         
     } else {
         
-        cube.visible = false;
+        var ray = getMouseRay(m, mvMatrix, pMatrix),
+            face = Body.getFaceInRay(ray.origin, ray.direction);
+
+        if (face) {
+
+            vec3.add(face.cube.position, Body.faceNormals[face.type], cube.position);
+            cube.visible = true;
+
+        } else {
+
+            cube.visible = false;
+
+        }
         
     }
+    
+    mouse = m;
 
 };
 
@@ -151,12 +180,26 @@ function onMouseDown(event) {
         cube.visible = false;
         
     }
+    
+    mouse = getMouse(event);
 
 };
 
 function onMouseUp(event) {
 
     rotate = false;
+
+};
+
+function onScroll(event) {
+
+    event.preventDefault();
+    
+    var delta = event.wheelDelta || (event.detail * -5);
+    
+    delta = 1 + delta * 0.0002;
+    
+    mat4.scale(mvMatrix, [delta, delta, delta]);
 
 };
 
@@ -202,12 +245,10 @@ function render() {
     
     requestAnimationFrame(render, canvas);
     
-    // if (end) return;
+    var t = +(new Date()).getTime(),
+        dt = t - time;
     
-    var dt,
-        t = (new Date()).getTime();
-        
-    dt = (t - time) * 0.001;
+    dt *= 0.001;
     dt = dt > 0.04 ? 0.04 : dt;
         
     time = t;
@@ -217,25 +258,7 @@ function render() {
     
 };
 
-function rotateMatrix(angle, axis, vector) {
-    
-    mat4.identity(rotMatrix);
-    mat4.rotate(rotMatrix, angle, axis);
-    
-    mat4.multiply(mvMatrix, rotMatrix);
-    
-    mat4.inverse(rotMatrix);
-    mat4.multiplyVec3(rotMatrix, vector);
-    
-};
-
 function update(dt) {
-    
-    if (rotate) {
-        
-        rotateMatrix(mouse.x * 0.2, up, axis);
-        
-    }
     
     Body.update(dt);
     
@@ -342,15 +365,13 @@ var canvas, gl, shader,
     
     time,
     
-    up, axis, 
-    gravity,
+    axis, gravity,
     
     mvMatrix, pMatrix, rotMatrix = mat4.create(),
     matrixStack = [],
     
-    mouse = {x : 0, y : 0},
+    mouse,
     
-    end = false,
     rotate = false;
 
 window.onload = function() {
@@ -373,6 +394,9 @@ window.onload = function() {
     canvas.onmousedown = onMouseDown;
     canvas.onmouseup = onMouseUp;
     canvas.onmousemove = onMouseMove;
+    
+    document.addEventListener("DOMMouseScroll", onScroll, false);
+    document.addEventListener("mousewheel", onScroll, false);
     
     switchColor(1);
 
@@ -397,13 +421,13 @@ window.onload = function() {
     gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
     
     
-    var center = [0, 0, -1],
-        eye = [10, 8, 4];
-    
-    up = [0, 0, 1];
-    axis = [0, -1, 0];
+    var center = [0, 0, 0],
+        eye = [12, 10, 8],
+        up = [0, 0, 1];
     
     mvMatrix = mat4.lookAt(eye, center, up);
+    
+    axis = vec3.cross(eye, up, vec3.create());
     
     
     Cube.init();
