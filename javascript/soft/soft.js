@@ -171,13 +171,18 @@ function onMouseMove(event) {
 };
 
 function onMouseDown(event) {
-
-    rotate = true;
     
     if (cube.visible) {
         
         Body.addCube(vec3.create(cube.position));
         cube.visible = false;
+        
+        rotate = false;
+        onMouseMove(event);
+        
+    } else {
+        
+        rotate = true;
         
     }
     
@@ -326,6 +331,16 @@ function toggleWireframe() {
     
     Body.drawEdges = !Body.drawEdges;
     
+    if (Body.drawEdges) {
+        
+        document.querySelector("#wireframe").className += " active";
+        
+    } else {
+        
+        document.querySelector("#wireframe").className += "button";
+        
+    }
+    
 };
 
 function switchColor(index) {
@@ -339,28 +354,52 @@ function switchColor(index) {
     
 };
 
-function start() {
+function go() {
     
-    gravity = [0, 0, -9.81];
+    on = !on;
     
-};
-
-function stop() {
-    
-    gravity = [0, 0, 0];
-    Body.reset();
+    if (on) {
+        
+        gravity = [0, 0, -9.81];
+        
+        document.querySelector("#go").className += " active";
+        
+    } else {
+        
+        gravity = [0, 0, 0];
+        Body.reset();
+        
+        document.querySelector("#go").className = "button";
+        
+    }
     
 };
 
 function reset() {
     
-    stop();
+    var e = document.querySelector("#clear"),
+        c = e.className;
+    
+    e.className += " active";
+    
+    setTimeout(function() {
+    
+        e.className = c;
+    
+    }, 200);
+    
+    if (on) {
+        
+        go();
+        
+    }
+    
     Body.init();
     
 };
 
 var canvas, gl, shader,
-
+    
     cube,
     
     time,
@@ -372,7 +411,8 @@ var canvas, gl, shader,
     
     mouse,
     
-    rotate = false;
+    rotate = false,
+    on = false;
 
 window.onload = function() {
 
@@ -394,6 +434,8 @@ window.onload = function() {
     canvas.onmousedown = onMouseDown;
     canvas.onmouseup = onMouseUp;
     canvas.onmousemove = onMouseMove;
+    
+    canvas.onselectstart = function() {return false;};
     
     document.addEventListener("DOMMouseScroll", onScroll, false);
     document.addEventListener("mousewheel", onScroll, false);

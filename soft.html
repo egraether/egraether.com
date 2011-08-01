@@ -21,15 +21,24 @@
             padding: 10px 30px;
             background: #CCCCCC;
         }
-        span {
+        .button {
+            padding: 3px 7px;
+            border: 1px solid black;
+            background: #DDDDDD;
+        }
+        .active {
+            border-color: white;
+        }
+        #colors > span {
             float: left;
             display: block;
             height: 16px;
             width: 16px;
             margin: 3px 5px;
-        }
-        #colors > span {
             border: 1px solid black;
+        }
+        .floatClear {
+            clear: both;
         }
     </style>
     
@@ -49,15 +58,15 @@
 </head>
 <body>
     <p>
-        soft-bodies by <a href="http://egraether.com">egraether</a> - mousedown to rotate - <a href="http://egraether.com/index.html#soft">more</a>
+        soft bodies by <a href="http://egraether.com">egraether</a> - drag to rotate / scroll to zoom / click to add cube - <a href="http://egraether.com/index.html#soft">more</a>
+    </p>
+    <div class="floatClear"></div>
+    <p>
+        <span class="button" id="go" onclick="go()" />start</span>
+        <span class="button" id="clear" onclick="reset()" />clear</span>
     </p>
     <p>
-        <input type="button" value="start" onclick="start()" />
-        <input type="button" value="stop" onclick="stop()" />
-        <input type="button" value="clear" onclick="reset()" />
-    </p>
-    <p>
-        <input type="button" value="wireframe" onclick="toggleWireframe()" />
+        <span class="button" id="wireframe" onclick="toggleWireframe()" />wireframe</span>
     </p>
     <p id="colors">
         <span style="background: #CC6666;" onclick="switchColor(0)"></span>
