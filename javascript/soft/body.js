@@ -97,6 +97,22 @@ var Body = {
         
         for (var i = 0; i < 6; i++) {
             
+            if (cube.faceNeighbors[i]) {
+                
+                var neighborVertices = cube.faceNeighbors[i].vertices,
+                    diagonalMergeIndices = this.diagonalEdgeMergeIndices[i];
+                
+                for (var j = 0; j < 4; j++) {
+                    
+                    this.edges.push(new Edge(
+                        cubeVertices[diagonalMergeIndices[j * 2]], 
+                        neighborVertices[diagonalMergeIndices[j * 2 + 1]]
+                    ));
+                    
+                }
+                
+            }
+            
             if (!cube.faces[i]) {
                 
                 for (var j = 0; j < 2; j++) {
@@ -223,6 +239,7 @@ var Body = {
                     straightEdges = this.straightEdgeIndices[faceType];
                 
                 cube.faces[faceType] = face;
+                cube.faceNeighbors[faceType] = neighbor;
                 
                 for (var j = 0; j < 4; j++) {
                     
@@ -355,6 +372,10 @@ var Body = {
                     this.vertexArray[x] = pos[0];
                     this.vertexArray[x + 1] = pos[1];
                     this.vertexArray[x + 2] = pos[2];
+                    
+                    this.normalArray[x] = pos[0];
+                    this.normalArray[x + 1] = pos[1];
+                    this.normalArray[x + 2] = pos[2];
                     
                     this.colorArray[x] = col[0];
                     this.colorArray[x + 1] = col[1];
@@ -646,6 +667,28 @@ var Body = {
             1, 7,
             2, 4,
             3, 5
+        
+        ];
+        
+        this.diagonalEdgeMergeIndices = [
+        
+            // front
+            [4, 2, 5, 3, 6, 0, 7, 1],
+        
+            // right
+            [1, 7, 2, 4, 6, 0, 5, 3],
+        
+            // top
+            [2, 4, 3, 5, 7, 1, 6, 0],
+        
+            // back
+            [0, 6, 1, 7, 2, 4, 3, 5],
+        
+            // left
+            [0, 6, 3, 5, 7, 1, 4, 2],
+        
+            // bottom
+            [0, 6, 1, 7, 5, 3, 4, 2],
         
         ];
     

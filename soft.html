@@ -2,7 +2,7 @@
 <html lang=en>
 <head>
     <meta name="author" content="Eberhard Gräther">
-    <title>egraether - soft-bodies</title>
+    <title>egraether - soft body painter</title>
     
     <style type="text/css">
         * {
@@ -25,6 +25,7 @@
             padding: 3px 7px;
             border: 1px solid black;
             background: #DDDDDD;
+            margin-right: 20px;
         }
         .active {
             border-color: white;
@@ -58,23 +59,15 @@
 </head>
 <body>
     <p>
-        soft bodies by <a href="http://egraether.com">egraether</a> - drag to rotate / scroll to zoom / click to add cube - <a href="http://egraether.com/index.html#soft">more</a>
+        soft body painter by <a href="http://egraether.com">egraether</a> - drag to rotate / scroll to zoom / click to add cube - <a href="http://egraether.com/index.html#soft">more</a>
     </p>
     <div class="floatClear"></div>
     <p>
-        <span class="button" id="go" onclick="go()" />start</span>
+        <span class="button" id="go" onclick="go()" />start/stop</span>
+        <span class="button" id="wireframe" onclick="toggleWireframe()" />wireframe</span>
         <span class="button" id="clear" onclick="reset()" />clear</span>
     </p>
-    <p>
-        <span class="button" id="wireframe" onclick="toggleWireframe()" />wireframe</span>
-    </p>
     <p id="colors">
-        <span style="background: #CC6666;" onclick="switchColor(0)"></span>
-        <span style="background: #66CC66;" onclick="switchColor(1)"></span>
-        <span style="background: #6666CC;" onclick="switchColor(2)"></span>
-        <span style="background: #CCCC66;" onclick="switchColor(3)"></span>
-        <span style="background: #66CCCC;" onclick="switchColor(4)"></span>
-        <span style="background: #CC66CC;" onclick="switchColor(5)"></span>
     </p>
     <!-- <p>
         x: <input type="text" size="3" id="x" value="0" />
@@ -146,7 +139,7 @@
     
         gl_Position = uPMatrix * uMVMatrix * vec4( aPosition, 1.0 );
         
-        vColor = vec4( aColor * ( dot( aNormal, uLight ) * 0.2 + 0.8 ), 1.0);
+        vColor = vec4( aColor * ( abs( dot( normalize( aNormal ), uLight ) * 0.5 ) + 0.5 ), 1.0);
     
     }
     

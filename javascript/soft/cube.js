@@ -3,13 +3,15 @@ var Cube = function(position) {
     this.position = position;
     
     this.faces = [];
-    this.vertices = [];
+    this.faceNeighbors = [];
     
+    this.vertices = [];
     this.straightEdges = [];
     
     for (var i = 0; i < 6; i++) {
         
         this.faces[i] = false;
+        this.faceNeighbors[i] = false;
         
     }
     

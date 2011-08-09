@@ -354,6 +354,38 @@ function switchColor(index) {
     
 };
 
+// <span style="background: #CC66CC;" onclick="switchColor(5)"></span>
+
+function initColors() {
+    
+    var node = document.querySelector("#colors"),
+        child,
+        c;
+    
+    for (var i = 0; i < Vertex.colors.length; i++) {
+        
+        c = Vertex.colors[i];
+        
+        child = document.createElement("span");
+        
+        child.style.background = "rgb(" + (c[0] * 100) + "%," + (c[1] * 100) + "%," + (c[2] * 100) + "%)";
+        
+        child.onclick = (function() {
+            
+            var a = i;
+            
+            return function() {
+                switchColor(a);
+            };
+            
+        })();
+        
+        node.appendChild(child);
+        
+    }
+    
+};
+
 function go() {
     
     on = !on;
@@ -440,7 +472,8 @@ window.onload = function() {
     document.addEventListener("DOMMouseScroll", onScroll, false);
     document.addEventListener("mousewheel", onScroll, false);
     
-    switchColor(1);
+    initColors();
+    switchColor(4);
 
 
     gl = canvas.getContext("experimental-webgl");
