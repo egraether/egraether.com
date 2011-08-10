@@ -200,7 +200,7 @@ function onScroll(event) {
 
     event.preventDefault();
     
-    var delta = event.wheelDelta || (event.detail * -5);
+    var delta = event.wheelDelta || (event.detail * -10);
     
     delta = 1 + delta * 0.0002;
     
