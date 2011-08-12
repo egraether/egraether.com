@@ -57,4 +57,75 @@ title: home
   </ul>
   <div class="floatClear"></div>
 </div>
+
+<div id="container"></div>
+
+<script type="text/javascript" charset="utf-8" src="javascript/requestAnimationFrame.js"></script>
+<script type="text/javascript" charset="utf-8" src="javascript/GameOfLife.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+
+    var life;
+    
+    function run() {
+        
+        setTimeout( function() {
+            
+            requestAnimationFrame( run );
+            
+        }, 100 );
+        
+        life.update();
+        
+    };
+    
+    function start() {
+        
+        life.init();
+        life.random( 0.08 );
+        
+    }
+    
+    window.onload = function() {
+        
+        var container = document.getElementById( "container" );
+        
+        life = new GameOfLife( container );
+        
+        window.onresize = function() {
+            
+            life.setCanvasSize( container.clientWidth, container.clientHeight );
+            
+            start();
+            
+        }
+        
+        life.getCanvas().onmouseup = function(event) {
+        
+            life.random( 0.08 );
+        
+        }
+        
+        life.drawCell = function( context, x, y, size, value ) {
+        
+            var s = size * ( 0.9 + value / 10 ),
+                t = ( size - s ) / 2;
+        
+            context.fillRect( x * size + t, y * size + t, s, s );
+        
+        };
+        
+        life.setCellSize( 4 );
+        life.setFadeSteps( 1 );
+        
+        life.setLifeColor( 110, 174, 13 );
+        life.setDeathColor( 220, 255, 150 );
+        life.setClearColor( 255, 255, 255 );
+        
+        start();
+        run();
+        
+    };
+
+</script>
   

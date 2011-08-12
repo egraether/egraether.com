@@ -277,6 +277,7 @@ header, #footer, .content {
   
   &:hover {
     background-position: 0px -72px;
+    .shadowOut(-2px, 2px, 7px);
   }
 }
 
@@ -305,6 +306,17 @@ header, #footer, .content {
   width: 500px;
   .shadowOut(1px, 1px, 5px, 0.3);
   background-color: white;
+}
+
+#container {
+  .shadowOut(-3px, 3px, 10px);
+  width: 896px;
+  height: 96px;
+  margin: 24px auto 48px;
+  
+  &:hover { 
+    .shadowOut(-2px, 2px, 7px);
+  }
 }
 
 
@@ -344,6 +356,10 @@ px      68    160    252    344    436    528    620    712    */
   
   .projectText { 
     height: 312px;
+  }
+  
+  #container {
+    width: 712px;
   }
 }
 
@@ -389,6 +405,10 @@ px      68    160    252    */
   .projectText { 
     height: auto;
   }
+  
+  #container {
+    width: 252px;
+  }
 }
 
 
@@ -427,6 +447,10 @@ px      68    160    252    344    436    */
   }
   
   .project { 
+    width: 436px;
+  }
+  
+  #container {
     width: 436px;
   }
 }
