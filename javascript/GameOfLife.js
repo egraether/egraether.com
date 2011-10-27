@@ -25,7 +25,7 @@ var GameOfLife = function( container ) {
         initialized = false;
     
     
-    if ( CanvasRenderingContext2D ) {
+    if ( canvas.getContext ) {
         
         ctx = canvas.getContext( "2d" );
         
