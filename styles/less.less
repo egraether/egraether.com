@@ -80,17 +80,17 @@ body {-webkit-tap-highlight-color: rgb(255,255,158);}
 
 /* main style */
 
-/*@baseColor: #1B98BD;
-@baseColor: #CF000C;
-@baseColor: #318ECE;*/
 @baseColor: #6EAE0D;
 
 @textColor: rgb(60,60,60);
 @backgroundColor: rgb(245, 245, 245);
 @borderColor: @textColor;
+@buttonColor: rgb(240, 240, 240);
 
 .hide { display: none; }
-.floatClear { clear: both; }
+.clear { clear: both; }
+.right { float: right; }
+.left { float: left; }
 .bold { font-weight: bold; }
 
 .round (@radius: 5px) {
@@ -143,28 +143,20 @@ a {
 
 .button {
   padding: 2px 8px 1px;
-  margin-top: 12px;
-  margin-right: 12px;
+  margin: 6px 12px 6px 0;
   
   color: @textColor;
-  border: 1px @textColor solid;
+  border: 1px darken(@buttonColor, 15%) solid;
+  background-color : @buttonColor;
   
-  float: right;
-/*  .round(2px);*/
+  float: left;
+  
+  .round(4px);
+  .shadowOut(-2px, 2px, 7px, 0.15);
   
   &:hover { 
-    .shadowIn(0px, 0px, 5px, 0.3);
+    .shadowOut(-2px, 2px, 7px, 0.08);
   }
-  
-  a {
-    color: @textColor;
-    &:hover { color: @textColor; }
-  }
-}
-
-.buttonLeft {
-  .button;
-  float: left;
 }
 
 .line {
@@ -237,7 +229,7 @@ header, #footer, .content {
   }
 }
 
-#about, #contact, .project {
+#about, #contact {
   float: left;
   margin: 12px 24px 12px 0;
 }
@@ -258,11 +250,10 @@ header, #footer, .content {
 }
 
 .project {
-  margin-top: 24px;
-  margin-bottom: 24px;
+  margin: 24px 24px 24px 0;
   padding-bottom: 12px;
   width: 436px;
-  border-bottom: 2px solid @textColor;
+  border-bottom : 2px solid @borderColor;
 }
 
 .projectTitle {
@@ -273,11 +264,12 @@ header, #footer, .content {
   background-repeat: no-repeat;
   background-color: @textColor;
   
+  .round(4px);
   .shadowOut(-3px, 3px, 10px);
   
   &:hover {
     background-position: 0px -72px;
-    .shadowOut(-2px, 2px, 7px);
+    .shadowOut(-3px, 3px, 10px, 0.35);
   }
 }
 
@@ -287,18 +279,16 @@ header, #footer, .content {
   color: lighten(@baseColor, 5%);
 }
 
-.projectSubtitle {
-  font-weight: bold;
-  padding: 12px 0px;
+.projectContent > * {
+  padding: 12px 12px 0;
 }
 
-.projectText {
-  padding: 0px 12px;
-  height: 264px;
+.projectContent ul {
+  padding-left: 12px;
 }
 
-.projectButtons {
-  
+.workInProgress {
+  color : @textColor;
 }
 
 #pong {
@@ -309,13 +299,14 @@ header, #footer, .content {
 }
 
 #container {
-  .shadowOut(-3px, 3px, 10px);
   width: 896px;
   height: 96px;
-  margin: 24px auto 48px;
+  margin: 12px auto 36px;
+  
+  .shadowOut(-3px, 3px, 10px);
   
   &:hover { 
-    .shadowOut(-2px, 2px, 7px);
+    .shadowOut(-3px, 3px, 10px, 0.35);
   }
 }
 
@@ -352,10 +343,6 @@ px      68    160    252    344    436    528    620    712    */
   
   .project { 
     width: 344px;
-  }
-  
-  .projectText { 
-    height: 312px;
   }
   
   #container {
@@ -400,10 +387,6 @@ px      68    160    252    */
   
   .project { 
     width: 252px;
-  }
-  
-  .projectText { 
-    height: auto;
   }
   
   #container {

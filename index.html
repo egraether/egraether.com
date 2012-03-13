@@ -18,11 +18,9 @@ title: home
       I develop games with special interest in game & interaction design. I hope you like my projects, they were a lot of work.
     </p>
     <p>
-      I'll spend my <span class="bold">internship</span> this fall in the <a href="http://exertiongameslab.org/">Exertion Games Lab</a> at <a href="http://www.rmit.edu.au/">RMIT</a>.
+      I'm currently looking for a job as <span class="bold">junior game developer</span>, international position desirable.
     </p>
-    <p>
-      <a href="/downloads/resume_egraether.pdf" target="blank"><div class="buttonLeft">resum&eacute;</div></a>
-    </p>
+    <a href="/downloads/resume_egraether.pdf" target="blank"><div class="button left">resum&eacute;</div></a>
   </div>
 
   <div id="contact">
@@ -34,31 +32,75 @@ title: home
     </ul>
   </div>
   
-  <div class="floatClear"></div>
+  <div class="clear"></div>
 </div>
 
 <div class="line"></div>
 
 <div class="content">
-  <ul>
+  <h2>Games</h2>
+  <ul class="left">
     {% for post in site.posts %}
-      <li class="project">
-        <a name="{{ post.name }}" href="{{ post.titlelink }}">
-          <div class="projectTitle" style="background-image: url(/images/{{ post.name }}_pic.png)">
-            <div>{{ post.title }}</div>
-            <div class="projectLanguage">{ {{ post.language }} }</div>
+      {% if post.type == "game" %}
+        <li class="project">
+          <a name="{{ post.name }}" href="{{ post.titlelink }}">
+            <div class="projectTitle" style="background-image: url(/images/{{ post.name }}_pic.png)">
+              <div class="left">{{ post.title }}</div>
+                {% if post.workInProgress == true %}
+                  <div class="right workInProgress">[work in progress]</div>
+                {% endif %}
+              <div class="clear projectLanguage">{ {{ post.language }} }</div>
+            </div>
+          </a>
+          <div class="projectContent">
+            {{ post.content }}
           </div>
-        </a>
-        <div class="projectContent">
-          {{ post.content }}
-        </div>
-      </li>
+        </li>
+      {% endif %}
+      
+      {% if forloop.index == 5 %}
+        </ul><ul class="left">
+      {% endif %}
+      
     {% endfor %}
   </ul>
-  <div class="floatClear"></div>
+  
+  <div class="clear"></div>
+  
 </div>
 
 <div id="container"></div>
+
+<div class="line"></div>
+
+<div class="content">
+  <h2>Demos</h2>
+  <ul class="left">
+    {% for post in site.posts %}
+      {% if post.type == "demo" %}
+        <li class="project">
+          <a name="{{ post.name }}" href="{{ post.titlelink }}">
+            <div class="projectTitle" style="background-image: url(/images/{{ post.name }}_pic.png)">
+              <div>{{ post.title }}</div>
+              <div class="projectLanguage">{ {{ post.language }} }</div>
+            </div>
+          </a>
+          <div class="projectContent">
+            {{ post.content }}
+          </div>
+        </li>
+      {% endif %}
+      
+      {% if forloop.index == 3 %}
+        </ul><ul class="left">
+      {% endif %}
+      
+    {% endfor %}
+  </ul>
+  
+  <div class="clear"></div>
+  
+</div>
 
 <script type="text/javascript" charset="utf-8" src="javascript/requestAnimationFrame.js"></script>
 <script type="text/javascript" charset="utf-8" src="javascript/GameOfLife.js"></script>
