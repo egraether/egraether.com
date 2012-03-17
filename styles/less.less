@@ -127,9 +127,8 @@ body {-webkit-tap-highlight-color: rgb(255,255,158);}
 }
 
 .gradient() {
-  
-  @fromColor: @backgroundColor;
-  @toColor: darken(@backgroundColor, 15%);
+  @fromColor: @buttonColor;
+  @toColor: darken(@buttonColor, 8%);
   
   background: -webkit-gradient(linear, left top, left bottom, from(@fromColor), to(@toColor));
   background: -moz-linear-gradient(top,  @fromColor, @toColor);
@@ -146,17 +145,20 @@ a {
   margin: 6px 12px 6px 0;
   
   color: @textColor;
-  border: 1px darken(@buttonColor, 15%) solid;
   background-color : @buttonColor;
+  border: 1px solid darken(@buttonColor, 20%);
   
   float: left;
   
   .round(4px);
+  
   .shadowOut(-2px, 2px, 7px, 0.15);
   
   &:hover { 
     .shadowOut(-2px, 2px, 7px, 0.08);
   }
+  
+  .gradient();
 }
 
 .line {
@@ -299,6 +301,8 @@ header, #footer, .content {
 }
 
 #container {
+  cursor: pointer;
+  
   width: 896px;
   height: 96px;
   margin: 12px auto 36px;

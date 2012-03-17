@@ -652,18 +652,25 @@
         mvMatrix, rotMatrix = mat4.create(),
         matrixStack = [],
         mouse = {x : 0, y : 0},
-        intersection = true;
+        intersection = true,
+        canvas;
 
     window.onload = function() {
 
-        var canvas = document.getElementById("canvas");
+        canvas = document.querySelector("canvas");
         
-        if (!window.WebGLRenderingContext) {
+        if ( !!window.WebGLRenderingContext ) {
             
+            gl = canvas.getContext("experimental-webgl", {stencil: true});
+            
+        }
+        
+        if ( !gl ) {
+        
             canvas.parentNode.innerHTML += '<p>Your browser does not support WebGL.<br/>' + 
                 '<a href="http://get.webgl.org">http://get.webgl.org</a></p>';
             return;
-            
+        
         }
 
         canvas.style.backgroundColor = "black";
@@ -671,8 +678,6 @@
         canvas.width = window.innerWidth,
         canvas.height = window.innerHeight;
 
-
-        gl = canvas.getContext("experimental-webgl", {stencil: true});
 
         gl.clearColor(0.9, 0.9, 0.9, 1.0);
         gl.viewport(0, 0, canvas.width, canvas.height);
