@@ -43,8 +43,8 @@
     </p>
     <div id="container"></div>
 
-<script type="text/javascript" charset="utf-8" src="javascript/requestAnimationFrame.js"></script>
-<script type="text/javascript" charset="utf-8" src="javascript/GameOfLife.js"></script>
+<script type="text/javascript" charset="utf-8" src="../lib/requestAnimationFrame.js"></script>
+<script type="text/javascript" charset="utf-8" src="GameOfLife.js"></script>
 
 <script type="text/javascript" charset="utf-8">
 
@@ -70,11 +70,15 @@
     
     function start() {
         
-        var val = rand( 150, 55 );
+        var val = [
+            rand( 50, 155 ),
+            rand( 50, 155 ),
+            rand( 50, 155 )
+        ];
         
-        life.setClearColor( val, val, val );
-        life.setLifeColor( rand( 0, 100 ), rand( 0, 100 ), rand( 0, 100 ) );
-        life.setDeathColor( val, val, val );
+        life.setClearColor( 255, 255, 255 );
+        life.setLifeColor( val[0], val[1], val[2] );
+        life.setDeathColor( val[0] + 100, val[1] + 100, val[2] + 100 );
         
         life.init();
         life.random( 0.08 );
