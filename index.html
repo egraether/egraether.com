@@ -107,7 +107,7 @@ title: home
 
 <script type="text/javascript" charset="utf-8">
 
-    var life;
+    var life, time = 0;
     
     function run() {
         
@@ -144,7 +144,20 @@ title: home
         
         life.getCanvas().onmouseup = function(event) {
         
-            life.random( 0.08 );
+            var newTime = new Date().getTime(),
+                diffTime = newTime - time;
+            
+            if ( diffTime < 200 ) {
+                
+                window.location = "demos/life/index.html"
+            
+            } else {
+        
+                life.random( 0.08 );
+            
+            }
+            
+            time = newTime;
         
         }
         

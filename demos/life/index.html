@@ -25,22 +25,19 @@
     
     <script type="text/javascript">
 
-      // var _gaq = _gaq || [];
-      // _gaq.push(['_setAccount', 'UA-18871992-2']);
-      // _gaq.push(['_trackPageview']);
-      // 
-      // (function() {
-      //   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      //   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      //   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      // })();
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-18871992-2']);
+      _gaq.push(['_trackPageview']);
+      
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
 
     </script>
 </head>
 <body>
-    <p>
-        game of life by <a href="http://egraether.com">egraether</a> - click to restart - <a href="http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">about</a>
-    </p>
     <div id="container"></div>
 
 <script type="text/javascript" charset="utf-8" src="../lib/requestAnimationFrame.js"></script>
@@ -81,7 +78,7 @@
         life.setDeathColor( val[0] + 100, val[1] + 100, val[2] + 100 );
         
         life.init();
-        life.random( 0.18 );
+        life.random( 0.1 );
         
     }
     
