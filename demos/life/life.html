@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang=en>
+<head>
+    <meta name="author" content="Eberhard Gräther">
+    <title>egraether - game of life</title>
+    
+    <style type="text/css">
+        * {
+            padding: 0; 
+            margin: 0; 
+            overflow: hidden;
+        }
+        #container {
+            z-index: -1;
+            position: absolute;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+        }
+        p {
+            font: 16px/24px Georgia, serif;
+            padding: 10px;
+        }
+    </style>
+    
+    <script type="text/javascript">
+
+      // var _gaq = _gaq || [];
+      // _gaq.push(['_setAccount', 'UA-18871992-2']);
+      // _gaq.push(['_trackPageview']);
+      // 
+      // (function() {
+      //   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      //   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      //   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      // })();
+
+    </script>
+</head>
+<body>
+    <p>
+        game of life by <a href="http://egraether.com">egraether</a> - click to restart - <a href="http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">about</a>
+    </p>
+    <div id="container"></div>
+
+<script type="text/javascript" charset="utf-8" src="javascript/requestAnimationFrame.js"></script>
+<script type="text/javascript" charset="utf-8" src="javascript/GameOfLife.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+
+    var life;
+    
+    function run() {
+        
+        setTimeout( function() {
+            
+            requestAnimationFrame( run );
+            
+        }, 100 );
+        
+        life.update();
+        
+    };
+    
+    function rand( offset, area ) {
+        
+        return Math.floor( Math.random() * area ) + offset;
+        
+    }
+    
+    function start() {
+        
+        var val = rand( 150, 55 );
+        
+        life.setClearColor( val, val, val );
+        life.setLifeColor( rand( 0, 100 ), rand( 0, 100 ), rand( 0, 100 ) );
+        life.setDeathColor( val, val, val );
+        
+        life.init();
+        life.random( 0.08 );
+        
+    }
+    
+    window.onload = function() {
+        
+        var container = document.getElementById( "container" );
+        
+        life = new GameOfLife( container );
+        
+        window.onresize = function() {
+            
+            life.setCanvasSize( container.clientWidth, container.clientHeight );
+            
+            start();
+            
+        }
+        
+        life.getCanvas().onmouseup = function(event) {
+        
+            start();
+        
+        }
+        
+        // life.drawCell = function( context, x, y, size, value ) {
+        // 
+        //     var s = size * ( 0.9 + value / 10 ),
+        //         t = ( size - s ) / 2;
+        // 
+        //     context.fillRect( x * size + t, y * size + t, s, s );
+        // 
+        // };
+        
+        life.setCellSize( 10 );
+        life.setFadeSteps( 5 );
+        
+        start();
+        run();
+        
+    };
+
+</script>
+
+</body>
+</html>
