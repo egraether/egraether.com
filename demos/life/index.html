@@ -77,7 +77,7 @@
         life.setLifeColor( val[0], val[1], val[2] );
         life.setDeathColor( val[0] + 100, val[1] + 100, val[2] + 100 );
         
-        life.init();
+        life.reset();
         life.random( 0.1 );
         
     }
@@ -87,6 +87,12 @@
         var container = document.getElementById( "container" );
         
         life = new GameOfLife( container );
+        
+        if ( !life ) {
+
+            return;
+
+        }
         
         window.onresize = function() {
             
@@ -102,17 +108,7 @@
         
         }
         
-        // life.drawCell = function( context, x, y, size, value ) {
-        // 
-        //     var s = size * ( 0.9 + value / 10 ),
-        //         t = ( size - s ) / 2;
-        // 
-        //     context.fillRect( x * size + t, y * size + t, s, s );
-        // 
-        // };
-        
         life.setCellSize( 10 );
-        life.setFadeSteps( 5 );
         
         start();
         run();

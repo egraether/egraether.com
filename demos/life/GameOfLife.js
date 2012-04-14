@@ -1,401 +1,260 @@
 var GameOfLife = function( container ) {
-    
-    var canvas = document.createElement( "canvas" ),
-        ctx = null,
-        
-        width, height,
-        cols, rows,
-        
-        cellSize = 5,
-        fadeSteps = 3,
-        fading = true,
-        
-        grids,
-        values,
-        
-        index = 0,
-        
-        deathColor = [ 255, 255, 255 ],
-        lifeColor = [ 0, 0, 0 ],
-        clearColor = deathColor,
-        
-        colors,
-        
-        updateIntervalID = null,
-        initialized = false;
-    
-    
-    if ( canvas.getContext ) {
-        
-        ctx = canvas.getContext( "2d" );
-        
-    }
-    
-    container.appendChild( canvas );
-    
-    width = canvas.width = container.clientWidth;
-    height = canvas.height = container.clientHeight;
-    
-    function getRGBString( color ) {
-        
-        return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
-        
-    };
-    
-    function getInterpolatedColor( colorA, colorB, factor ) {
-        
-        var color = [],
-            i;
-        
-        for ( i = 0; i < 3; i++ ) {
-            
-            color.push( Math.floor( colorA[i] + ( colorB[i] - colorA[i] ) * factor ) );
-            
-        }
-        
-        return color;
-        
-    };
-    
-    this.init = function() {
-        
-        if ( !ctx ) {
-        
-            return;
-        
-        }
-        
-        width = canvas.width;
-        height = canvas.height;
-        
-        cols = Math.floor( width / cellSize );
-        rows = Math.floor( height / cellSize );
-        
-        colors = [];
-        
-        var i;
-        
-        if ( fading ) {
-            
-            for ( i = 0; i <= fadeSteps; i++ ) {
-            
-                colors.push( getRGBString( getInterpolatedColor( deathColor, lifeColor, i / fadeSteps ) ) );
-            
-            }
-            
-        } else {
-            
-            colors.push( getRGBString( clearColor ), getRGBString( lifeColor ) );
-            
-        }
-        
-        initialized = true;
-        
-        this.reset();
-        
-    };
-    
-    this.reset = function() {
-        
-        var i, j;
-        
-        if ( initialized ) {
-        
-            grids = [ [], [] ];
-            values = [];
-        
-            for ( i = 0; i < rows; i++ ) {
-        
-                grids[0].push( [] );
-                grids[1].push( [] );
-        
-                values.push( [] );
-        
-                for ( j = 0; j < cols; j++) {
-            
-                    grids[0][i].push( false );
-                    grids[1][i].push( false );
-            
-                    values[i].push( -1 );
-            
-                }
-        
-            }
-        
-            this.clearCanvas();
-            
-        }
-        
-    };
-    
-    this.random = function( factor ) {
-        
-        var i, j, row;
-        
-        if ( initialized ) {
-        
-            for ( i = 0; i < rows; i++ ) {
-            
-                row = grids[index][i];
-            
-                for ( j = 0; j < cols; j++) {
-                
-                    if ( Math.random() < factor ) {
-                    
-                        row[j] = true;
-                        values[i][j] = fadeSteps;
-                    
-                    } else {
-                    
-                        row[j] = false;
-                        values[i][j] = -1;
-                    
-                    }
-            
-                }
-        
-            }
-        
-            this.clearCanvas();
-        
-        }
-        
-    };
-    
-    this.clearCanvas = function() {
-        
-        ctx.fillStyle = getRGBString( clearColor );
-        ctx.fillRect( 0, 0, width, height );
-        
-    }
-    
-    this.update = function() {
-        
-        var i, j, k, l, m, n, num, c, row, s, t;
-        
-        if ( initialized ) {
-        
-            for ( i = 0; i < rows; i++ ) {
-        
-                for ( j = 0; j < cols; j++) {
-                    
-                    if ( values[i][j] >= 0 ) {
-                        
-                        ctx.fillStyle = colors[ values[i][j] ];
-                        this.drawCell( ctx, j, i, cellSize, values[i][j] / fadeSteps );
-                        
-                        values[i][j]--;
-                    
-                    }
-                
-                    num = 0;
-                
-                    for ( k = 0; k < 3; k++ ) {
-                
-                        for ( l = 0; l < 3; l++ ) {
-                        
-                            m = i - 1 + k;
-                            n = j - 1 + l;
-                        
-                            m = m < 0 ? rows - 1 : m == rows ? 0 : m;
-                            n = n < 0 ? cols - 1 : n == cols ? 0 : n;
-                        
-                            if ( m == i && n == j ) {
-                            
-                                continue;
-                            
-                            }
-                        
-                            if ( grids[index][m][n] ) {
-                            
-                                num++;
-                            
-                            }
-                    
-                        }
-                
-                    }
-                
-                    if ( grids[index][i][j] ) {
-                    
-                        if ( num > 1 && num < 4 ) {
-                        
-                            grids[1 - index][i][j] = true;
-                            values[i][j] = fadeSteps;
-                        
-                        } else {
-                        
-                            grids[1 - index][i][j] = false;
-                        
-                        }
-                
-                    } else {
-                    
-                        if ( num == 3 ) {
-                    
-                            grids[1 - index][i][j] = true;
-                            values[i][j] = fadeSteps;
-                    
-                        } else {
-                        
-                            grids[1 - index][i][j] = false;
-                        
-                        }
-                    
-                    }
-                
-                }
-        
-            }
-        
-            index = 1 - index;
-        
-        }
-        
-    };
-    
-    this.drawCell = function( context, x, y, size, value ) {
-        
-        context.fillRect( x * size, y * size, size, size );
-        
-    };
-    
-    this.autoUpdate = function( millis ) {
-        
-        var self = this;
-        
-        updateIntervalID = setInterval( function() {
-            
-            self.update();
-            
-        }, millis );
-        
-    }
-    
-    this.stopAutoUpdate = function() {
-        
-        if ( updateIntervalID ) {
-            
-            clearInterval( updateIntervalID );
-            updateIntervalID = null;
-            
-        }
-        
-    }
-    
-    this.setFromArray = function( cells ) {
-        
-        if ( !initialized ) {
-            
-            this.init();
-            
-        }
-        
-        var i, j, k;
-        
-        for ( i = 0; i < cells.length; i += 2 ) {
-            
-            j = cells[i];
-            k = cells[i + 1];
-            
-            grids[index][j][k] = true;
-            values[j][k] = fadeSteps;
-            
-        }
-        
-    };
-    
-    this.setLifeColor = function( r, g, b ) {
-        
-        lifeColor = [ r, g, b ];
-        
-        if ( initialized ) {
-            
-            this.init();
-            
-        }
-        
-    };
-    
-    this.setDeathColor = function( r, g, b ) {
-        
-        deathColor = [ r, g, b ];
-        
-        if ( initialized ) {
-            
-            this.init();
-            
-        }
-        
-    };
-    
-    this.setClearColor = function( r, g, b ) {
-        
-        clearColor = [ r, g, b ];
-        
-    };
-    
-    this.setFadeSteps = function( steps ) {
-        
-        fadeSteps = steps < 1 ? 1 : steps;
-        fading = true;
-        
-        if ( initialized ) {
-            
-            this.init();
-            
-        }
-        
-    };
-    
-    this.noFade = function() {
-        
-        fadeSteps = 1;
-        fading = false;
-        
-        if ( initialized ) {
-            
-            this.init();
-            
-        }
-        
-    };
-    
-    this.setCellSize = function( value ) {
-        
-        cellSize = value;
-        
-        if ( initialized ) {
-            
-            this.init();
-            
-        }
-        
-    };
-    
-    this.setCanvasSize = function( width, height ) {
-        
-        canvas.width = width;
-        canvas.height = height;
-        
-        if ( initialized ) {
-            
-            this.init();
-            
-        }
-        
-    }
-    
-    this.getCanvas = function() {
-        
-        return canvas;
-        
-    };
-    
-    this.getContext = function() {
-        
-        return ctx;
-        
-    };
-    
+
+	var _canvas = document.createElement( "canvas" ),
+	_ctx = null,
+
+	_cols, _rows,
+	_cellSize = 5,
+
+	_cells = [ [], [] ],
+	_lifeCells = [],
+	_index = 0,
+
+	_colors = {
+
+		life : [ 0, 0, 0 ],
+		death : [ 255, 255, 255 ],
+		clear : [ 255, 255, 255 ],
+
+	};
+
+
+	if ( _canvas.getContext ) {
+
+		_ctx = _canvas.getContext( "2d" );
+
+	}
+
+ 	if ( !_ctx ){
+
+		return false;
+
+	}
+
+
+	container.appendChild( _canvas );
+
+	_canvas.width = container.clientWidth;
+	_canvas.height = container.clientHeight;
+
+
+	function getRGBString( color ) {
+
+		return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
+
+	};
+
+	function getLifeNeighbors( cells, X, Y ) {
+
+		var i, j, x, y, n = 0;
+
+		for ( i = 0; i < 3; i++ ) {
+
+			for ( j = 0; j < 3; j++ ) {
+
+				if ( i === 1 && j === 1 ) {
+
+					continue;
+
+				}
+
+				x = X - 1 + i;
+				y = Y - 1 + j;
+
+				x = x < 0 ? _cols - 1 : x === _cols ? 0 : x;
+				y = y < 0 ? _rows - 1 : y === _rows ? 0 : y;
+
+				if ( cells[x][y] ) {
+
+					n++;
+
+				}
+
+			}
+
+		}
+
+		return n;
+
+	};
+
+
+	this.reset = function() {
+
+		var i, j, col;
+
+		_cols = Math.floor( _canvas.width / _cellSize );
+		_rows = Math.floor( _canvas.height / _cellSize );
+
+		_cells = [ [], [] ];
+		_lifeCells = [];
+
+		for ( var i = 0; i < _cols; i++ ) {
+
+			col = [];
+
+			for ( var j = 0; j < _rows; j++ ) {
+
+				col.push( false );
+
+			}
+
+			_cells[0].push( col );
+			_cells[1].push( col.concat() );
+
+		}
+
+		this.clear();
+
+	};
+
+	this.random = function( factor ) {
+
+		var i, j;
+
+		_ctx.fillStyle = getRGBString( _colors.life );
+
+		for ( i = 0; i < _cols; i++ ) {
+
+			for ( j = 0; j < _rows; j++) {
+
+				if ( Math.random() < factor ) {
+
+					_lifeCells.push( i, j );
+					_cells[_index][i][j] = true;
+
+					this.drawCell( _ctx, i, j, _cellSize, true );
+
+				}
+
+			}
+
+		}
+
+	};
+
+	this.clear = function() {
+
+		_ctx.fillStyle = getRGBString( _colors.clear );
+		_ctx.fillRect( 0, 0, _canvas.width, _canvas.height );
+
+	};
+
+	this.update = function() {
+
+		var i, j, k, x, y, n, lifeCells = [];
+
+		for ( i = 0; i < _lifeCells.length; i += 2 ) {
+
+			for ( j = 0; j < 3; j++ ) {
+
+				for ( k = 0; k < 3; k++ ) {
+
+					x = _lifeCells[i] - 1 + j;
+					y = _lifeCells[i + 1] - 1 + k;
+
+					x = x < 0 ? _cols - 1 : x === _cols ? 0 : x;
+					y = y < 0 ? _rows - 1 : y === _rows ? 0 : y;
+
+
+					if ( _cells[1 - _index][x][y] ) {
+
+						continue;
+
+					}
+
+
+					n = getLifeNeighbors( _cells[_index], x, y );
+
+					if ( ( _cells[_index][x][y] && ( n === 2 || n === 3 ) ) ||
+						( !_cells[_index][x][y] && n === 3 ) ) {
+
+						_cells[1 - _index][x][y] = true;
+						lifeCells.push( x, y );
+
+					}
+
+				}
+
+			}
+
+		}
+
+
+		_ctx.fillStyle = getRGBString( _colors.death );
+
+		for ( i = 0; i < _lifeCells.length; i += 2 ) {
+
+			x = _lifeCells[i];
+			y = _lifeCells[i + 1];
+
+			this.drawCell( _ctx, x, y, _cellSize, false );
+
+			_cells[_index][x][y] = false;
+
+		}
+
+
+		_ctx.fillStyle = getRGBString( _colors.life );
+
+		for ( i = 0; i < lifeCells.length; i += 2 ) {
+
+			this.drawCell( _ctx, lifeCells[i], lifeCells[i + 1], _cellSize, true );
+
+		}
+
+		_index = 1 - _index;
+		_lifeCells = lifeCells;
+
+	};
+
+	this.drawCell = function( ctx, x, y, size, isLife ) {
+
+		ctx.fillRect( x * size, y * size, size, size );
+
+	};
+
+	this.setLifeColor = function( r, g, b ) {
+
+		_colors.life = [ r, g, b ];
+
+	};
+
+	this.setDeathColor = function( r, g, b ) {
+
+		_colors.death = [ r, g, b ];
+
+	};
+
+	this.setClearColor = function( r, g, b ) {
+
+		_colors.clear = [ r, g, b ];
+
+	};
+
+	this.setCellSize = function( value ) {
+
+		_cellSize = value;
+
+	};
+
+	this.setCanvasSize = function( width, height ) {
+
+		_canvas.width = width;
+		_canvas.height = height;
+
+	};
+
+	this.getCanvas = function() {
+
+		return _canvas;
+
+	};
+
+	this.getContext = function() {
+
+		return _ctx;
+
+	};
+
 };
