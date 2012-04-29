@@ -126,9 +126,9 @@ body {-webkit-tap-highlight-color: rgb(255,255,158);}
           transition: all 0.123s ease-out;
 }
 
-.gradient() {
-  @fromColor: @buttonColor;
-  @toColor: darken(@buttonColor, 8%);
+.gradient( @from: 0, @to: 255 ) {
+  @fromColor: rgb(@from, @from, @from);
+  @toColor: rgb(@to, @to, @to);
   
   background: -webkit-gradient(linear, left top, left bottom, from(@fromColor), to(@toColor));
   background: -moz-linear-gradient(top,  @fromColor, @toColor);
@@ -152,13 +152,14 @@ a {
   
   .round(4px);
   
-  .shadowOut(-2px, 2px, 7px, 0.15);
-  
   &:hover { 
-    .shadowOut(-2px, 2px, 7px, 0.08);
+    .gradient(250, 240);
+  }
+  &:active { 
+    .gradient(240, 250);
   }
   
-  .gradient();
+  .gradient(240, 250);
 }
 
 .line {
@@ -267,11 +268,11 @@ header, #footer, .content {
   background-color: @textColor;
   
   .round(4px);
-  .shadowOut(-3px, 3px, 10px);
+  .shadowOut(-3px, 3px, 10px, 0.3);
   
   &:hover {
     background-position: 0px -72px;
-    .shadowOut(-3px, 3px, 10px, 0.35);
+    .shadowOut(-3px, 3px, 10px, 0.2);
   }
 }
 
@@ -307,10 +308,10 @@ header, #footer, .content {
   height: 96px;
   margin: 12px auto 36px;
   
-  .shadowOut(-3px, 3px, 10px);
+  .shadowOut(-3px, 3px, 10px, 0.3);
   
   &:hover { 
-    .shadowOut(-3px, 3px, 10px, 0.35);
+    .shadowOut(-3px, 3px, 10px, 0.2);
   }
 }
 
