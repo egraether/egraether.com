@@ -15,7 +15,11 @@ title: home
       with my major in <a href="http://multimediatechnology.at/ar-game/">Augmented Reality and Game</a>.
     </p>
     <p>
-      I develop games with special interest in game & interaction design. I hope you like my projects, they were a lot of work.
+      I develop games and web applications with special interest in interaction design.
+    </p>
+    <p>
+      I will do an internship at <a href="https://www.google.com/chrome/">Google Chrome</a> team 
+      California this fall.
     </p>
     <a href="/downloads/resume_egraether.pdf" target="blank"><div class="button left">resum&eacute;</div></a>
   </div>
@@ -26,6 +30,7 @@ title: home
       <li>mail: <a href="mailto:mail@egraether.com">mail@egraether.com</a></li>
       <li>twitter: <a href="http://twitter.com/#!/egraether">@egraether</a></li>
       <li>github: <a href="http://github.com/egraether/">egraether</a></li>
+      <li>project euler: <a href="http://projecteuler.net/profile/egraether.png">egraether</a></li>
     </ul>
   </div>
   
@@ -43,8 +48,8 @@ title: home
           <a name="{{ post.name }}" href="{{ post.titlelink }}">
             <div class="projectTitle" style="background-image: url(/images/{{ post.name }}_pic.png)">
               <div class="left">{{ post.title }}</div>
-                {% if post.workInProgress == true %}
-                  <div class="right workInProgress">[work in progress]</div>
+                {% if post.note %}
+                  <div class="right workInProgress">[{{ post.note }}]</div>
                 {% endif %}
               <div class="clear projectLanguage">{ {{ post.language }} }</div>
             </div>
@@ -55,7 +60,7 @@ title: home
         </li>
       {% endif %}
       
-      {% if forloop.index == 6 %}
+      {% if forloop.index == 7 %}
         </ul><ul class="left">
       {% endif %}
       
