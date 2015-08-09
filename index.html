@@ -9,9 +9,9 @@ title: home
       My name is <span class="bold">Eberhard Gräther</span>.
     </p>
     <p>
-      I'm student of master's degree
-      in <a href="http://multimediatechnology.at/in-english/">MultiMediaTechnology</a> 
-      at <a href="http://www.fh-salzburg.ac.at/en/">Salzburg University of Applied Sciences</a>,
+      I'm master's degree student
+      in <a href="http://multimediatechnology.at/in-english/">MultiMediaTechnology</a>
+      at <a href="http://www.fh-salzburg.ac.at/en/">Salzburg University of Applied Sciences</a>
       specializing in Human Computer Interaction.
     </p>
     <p>
@@ -29,7 +29,7 @@ title: home
       <li>project euler: <a href="http://projecteuler.net/profile/egraether.png">egraether</a></li>
     </ul>
   </div>
-  
+
   <div class="clear"></div>
 </div>
 
@@ -55,16 +55,16 @@ title: home
           </div>
         </li>
       {% endif %}
-      
+
       {% if forloop.index == 7 %}
         </ul><ul class="left">
       {% endif %}
-      
+
     {% endfor %}
   </ul>
-  
+
   <div class="clear"></div>
-  
+
 </div>
 
 <div id="container"></div>
@@ -88,16 +88,16 @@ title: home
           </div>
         </li>
       {% endif %}
-      
+
       {% if forloop.index == 4 %}
         </ul><ul class="left">
       {% endif %}
-      
+
     {% endfor %}
   </ul>
-  
+
   <div class="clear"></div>
-  
+
 </div>
 
 <script type="text/javascript" charset="utf-8" src="demos/lib/requestAnimationFrame.js"></script>
@@ -106,84 +106,83 @@ title: home
 <script type="text/javascript" charset="utf-8">
 
     var life, time = 0;
-    
+
     function run() {
-        
+
         setTimeout( function() {
-            
+
             requestAnimationFrame( run );
-            
+
         }, 100 );
-        
+
         life.update();
-        
+
     };
-    
+
     function start() {
-        
+
         life.reset();
         life.random( 0.08 );
-        
+
     }
-    
+
     window.onload = function() {
-        
+
         var container = document.getElementById( "container" );
-        
+
         life = new GameOfLife( container );
-        
+
         if ( !life ) {
-            
+
             return;
-            
+
         }
-        
+
         window.onresize = function() {
-            
+
             life.setCanvasSize( container.clientWidth, container.clientHeight );
-            
+
             start();
-            
+
         }
-        
+
         life.getCanvas().onmouseup = function(event) {
-        
+
             var newTime = new Date().getTime(),
                 diffTime = newTime - time;
-            
+
             if ( diffTime < 200 ) {
-                
+
                 window.location = "demos/life/index.html"
-            
+
             } else {
-        
+
                 start();
-            
+
             }
-            
+
             time = newTime;
-        
+
         }
-        
+
         life.drawCell = function( context, x, y, size, isLife ) {
-        
+
             var s = size * ( isLife ? 1 : 0.9 ),
                 t = ( size - s ) / 2;
-        
+
             context.fillRect( x * size + t, y * size + t, s, s );
-        
+
         };
-        
+
         life.setCellSize( 4 );
-        
+
         life.setLifeColor( 110, 174, 13 );
         life.setDeathColor( 220, 255, 150 );
         life.setClearColor( 255, 255, 255 );
-        
+
         start();
         run();
-        
+
     };
 
 </script>
-  
