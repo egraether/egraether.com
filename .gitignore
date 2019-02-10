@@ -1,3 +1,5 @@
 _site/
 _drafts/
 styles/less.css
+
+.DS_Store

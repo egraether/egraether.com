@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta name="author" content="Eberhard Gräther" />
+
+  <title>Drug Harm and Dependence</title>
+
+  <style>
+
+body {
+  font: 12px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
+
+.axis {
+  font: 14px sans-serif;
+}
+
+.dot {
+  stroke: black;
+}
+
+.tooltip {
+  position: absolute;
+  border-radius: 5px;
+  padding: 5px;
+  pointer-events: none;
+  background: white;
+  border: 1px solid #333;
+}
+
+.tooltip .title {
+  font-size: 14px;
+}
+
+.description {
+  width: 680px;
+  margin: 20px;
+}
+
+.description p {
+  font-size: 14px;
+}
+
+.description li {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+  </style>
+
+</head>
+<body>
+
+<div class="graph"></div>
+
+<div class="description">
+  <p>Submission to the <a href="https://www.reddit.com/r/dataisbeautiful/comments/an18kt/battle_dataviz_battle_for_the_month_of_february/">DataViz Battle</a> on <a href="https://www.reddit.com/r/dataisbeautiful/">reddit/r/dataisbeautiful</a> by <a href="http://egraether.com/">egraether</a></p>
+  <p>Data from <a href="https://commons.wikimedia.org/wiki/File:Development_of_a_rational_scale_to_assess_the_harm_of_drugs_of_potential_misuse_(physical_harm_and_dependence,_NA_free_means).svg#Data">Wikimedia</a></p>
+  <p>Implemented with <a href="https://d3js.org/">d3</a> and <a href=https://d3-legend.susielu.com/>d3 legend</a>. Source code available on <a href="https://github.com/egraether/egraether.com/blob/master/dataviz_battle/2019_february/drugs.html">GitHub</a>.</p>
+
+  <h2>Notes</h2>
+
+  <ul>
+    <li><b>Motivation</b>: Different kinds of drugs have a different impact, some worse than others.</li>
+    <li><b>Goal</b>: Give the viewer an impression on which drugs are more or less dangerous.</li>
+    <li><b>Type</b>: A single scatterplot was chosen, because it allows for easy comparison and can express multiple dimensions.</li>
+    <li><b>Position</b>: Showing the social and physical harm of taking the drug. The chart is square, because both axes use the same number range. Colors are used at the axes to underline progression from good to bad.</li>
+    <li><b>Size</b>: Pleasure is the reason why drugs are taken in the first place. This is shown in size to underline what you get from taking this drug.</li>
+    <li><b>Color</b>: A traffic light coloring is used to show psychological and physical dependence, giving a green go for low dependence drugs and a red stop for high dependence drugs.</li>
+    <li><b>Tooltip</b>: Detailed numbers on each drug are shown in the tooltip.</li>
+    <li><b>Summary</b>: If you want a "good" drug, look for a big green circle in the bottom left.</li>
+  </ul>
+</div>
+
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3-color.v1.min.js"></script>
+<script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.13.0/d3-legend.js"></script>
+
+<script>
+var margin = { top: 60, right: 120, bottom: 60, left: 80 },
+    size = { width: 480, height: 480 };
+
+var xValue = function(d) { return d["Mean Social harm"]; },
+    xScale = d3.scale.linear().range([0, size.width]),
+    xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+
+var yValue = function(d) { return d["Mean Physical harm[1]"]; },
+    yScale = d3.scale.linear().range([size.height, 0]),
+    yAxis = d3.svg.axis().scale(yScale).orient("left");
+
+var rValue = function(d) { return d["Pleasure"] * 5; };
+var cValue = function(d) { return d["Physical"] + d["Psychological"]; };
+
+var svg = d3.select(".graph").append("svg")
+    .attr("width", size.width + margin.left + margin.right)
+    .attr("height", size.height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var defs = svg.append("defs");
+
+var gradient = defs.append("linearGradient")
+  .attr("id", "svgGradient")
+  .attr("x1", "100%")
+  .attr("y1", "0%")
+  .attr("x2", "0%")
+  .attr("y2", "100%");
+
+var stopCount = 11;
+for (var i = 0; i < stopCount; i++)
+{
+  gradient.append("stop")
+   .attr("offset", (100 / (stopCount - 1) * i) / 2 + 50 + "%")
+   .attr("stop-color", d3.schemeRdYlGn[stopCount][i])
+   .attr("stop-opacity", 0.8);
+}
+
+svg.append("rect")
+  .attr("x", -4)
+  .attr("y", 0)
+  .attr("width", size.width + 4)
+  .attr("height", size.height + 4)
+  .attr("fill", "url(#svgGradient)")
+
+svg.append("rect")
+  .attr("x", 0)
+  .attr("y", 0)
+  .attr("width", size.width)
+  .attr("height", size.height)
+  .attr("fill", "white")
+
+var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+d3.csv("drugs.csv", function(error, data) {
+
+  data.forEach(function(d) {
+    d["Mean Physical harm[1]"] = +d["Mean Physical harm[1]"];
+    d["Mean Social harm"] = +d["Mean Social harm"];
+    d["Pleasure"] = +d["Pleasure"];
+    d["Psychological"] = +d["Psychological"];
+    d["Physical"] = +d["Physical"];
+  });
+
+  xScale.domain([0, 3.0]);
+  yScale.domain([0, 3.0]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + size.height + ")")
+      .call(xAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("x", size.width / 2)
+      .attr("y", 50)
+      .style("text-anchor", "middle")
+      .attr("font-size", "16px")
+      .text("Mean Social Harm");
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", -60)
+      .attr("x", -size.height / 2)
+      .attr("dy", ".71em")
+      .style("text-anchor", "middle")
+      .attr("font-size", "16px")
+      .text("Mean Physical Harm");
+
+  var rMin = d3.min(data, rValue);
+  var rMax = d3.max(data, rValue);
+  var cMin = 0;
+  var cMax = d3.max(data, cValue);
+
+  var tooltipShow = function(d) {
+    tooltip.transition()
+      .duration(150)
+      .style("opacity", .9);
+
+    tooltip.html(
+        "<span class=\"title\">" + d["Drug"] + "</span>" + "<br/>"
+        + "Pleasure: " + d["Pleasure"] + "<br/>"
+        + "Dependence - Physical: " + d["Physical"] + "<br/>"
+        + "Dependence - Psychological: " + d["Psychological"] + "<br/>"
+        + "Harm - Physical: " + d["Mean Physical harm[1]"] + "<br/>"
+        + "Harm - Social: " + d["Mean Social harm"] + "<br/>"
+      )
+      .style("left", (d3.event.pageX + 25) + "px")
+      .style("top", (d3.event.pageY - 25) + "px");
+  };
+
+  var tooltipHide = function(d) {
+    tooltip.transition()
+        .duration(250)
+        .style("opacity", 0);
+  };
+
+  svg.selectAll(".dot")
+      .data(data)
+    .enter().append("circle")
+      .attr("class", "dot")
+      .attr("cx", function(d) { return xScale(xValue(d)); })
+      .attr("cy", function(d) { return yScale(yValue(d)); })
+      .attr("r", function(d) { return rValue(d); })
+      .style("fill", function(d) { return d3.interpolateRdYlGn(1 - cValue(d) / cMax); })
+      .style("stroke", function(d) { return d3.color(d3.interpolateRdYlGn(1 - cValue(d) / cMax)).darker(2); })
+      .on("mouseover", tooltipShow)
+      .on("mouseout", tooltipHide);
+
+  svg.selectAll(".text")
+    .data(data)
+    .enter()
+    .append("text")
+    .text(function(d) { return d["Drug"]; })
+    .attr("x", function(d) {
+      var val = xScale(xValue(d)) + rValue(d) + 4;
+      if (d["Drug"] == "4-MTA") val -= 56;
+      if (d["Drug"] == "Barbiturates") val -= 100;
+      if (d["Drug"] == "Tobacco") val -= 80;
+      if (d["Drug"] == "Ecstasy") val -= 70;
+      if (d["Drug"] == "Anabolic steroids") val -= 120;
+      if (d["Drug"] == "Methylphenidate") val -= 118;
+      if (d["Drug"] == "Amphetamine") val -= 2;
+      if (d["Drug"] == "Solvents") val -= 54;
+      return val;
+    })
+    .attr("y", function(d) {
+      var val = yScale(yValue(d)) + 5;
+      if (d["Drug"] == "Amphetamine") val += 8;
+      if (d["Drug"] == "Cannabis") val += 8;
+      if (d["Drug"] == "Buprenorphine") val += 10;
+      if (d["Drug"] == "Solvents") val -= 20;
+      return val;
+    })
+    .attr("font-family", "sans-serif")
+    .attr("font-size", "13px")
+    .attr("fill", "#333")
+    .on("mouseover", tooltipShow)
+    .on("mouseout", tooltipHide);
+
+    var linearSize = d3.scale.linear()
+      .domain([rMin / 5, rMax / 5])
+      .range([rMin, rMax]);
+
+    svg.append("g")
+      .attr("class", "legendSize")
+      .attr("transform", "translate(510,60)");
+
+    var legendSize = d3.legend.size()
+      .scale(linearSize)
+      .shape('circle')
+      .shapePadding(10)
+      .labelOffset(10)
+      .orient('vertical')
+      .ascending(true)
+      .title("Pleasure");
+
+    svg.select(".legendSize")
+      .call(legendSize)
+      .selectAll("circle")
+      .style("fill", "#EEE")
+      .style("stroke", "#333");
+
+    var linear = d3.scale.linear()
+      .domain([cMin,cMax]);
+
+    svg.append("g")
+      .attr("class", "legendLinear")
+      .attr("transform", "translate(510,300)");
+
+    var legendLinear = d3.legend.color()
+      .orient('vertical')
+      .scale(linear)
+      .shape('circle')
+      .shapePadding(10)
+      .ascending(true);
+
+    svg.select(".legendLinear")
+      .call(legendLinear)
+      .selectAll("circle")
+      .style("fill", function(d) { return d3.interpolateRdYlGn(1 - (d / cMax)); })
+      .style("stroke", function(d) { return d3.color(d3.interpolateRdYlGn(1 - (d / cMax))).darker(2); });
+
+    svg.selectAll(".legendTitle")
+      .style("font-size", "14px");
+
+    svg.select(".legendLinear").select(".legendCells")
+      .attr("transform", "translate(20,10)");
+
+    svg.select(".legendSize").select(".legendCells")
+      .attr("transform", "translate(20,0)");
+
+    svg.append("text")
+      .text("Drug Harm and Dependence")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "24px")
+      .attr("transform", "translate(20,-20)");
+
+    svg.append("text")
+      .text("Psychological")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "14px")
+      .attr("transform", "translate(510,251)");
+    svg.append("text")
+      .text("+ Physical")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "14px")
+      .attr("transform", "translate(510,268)");
+    svg.append("text")
+      .text("Dependence")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "14px")
+      .attr("transform", "translate(510,285)");
+});
+
+</script>
+
+<script type="text/javascript">
+
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-18871992-2', { 'storage': 'none' });
+  ga('set', 'anonymizeIp', true);
+  ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
